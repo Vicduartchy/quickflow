@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react'
-import html2canvas from 'html2canvas'
 import { useApp } from '../../lib/context'
 
 interface ChartCardProps {
@@ -22,21 +21,23 @@ export function ChartCard({ id, title, description, available, missing, children
     if (!chartRef.current) return
     setDownloading(true)
     try {
-      // Scroll into view and wait for render
-      chartRef.current.scrollIntoView({ behavior: 'instant' })
-      await new Promise(r => setTimeout(r, 300))
+      // Dynamic import to avoid SSR issues
+      const html2canvas = (await import('html2canvas')).default
+      await new Promise(r => setTimeout(r, 200))
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        windowWidth: chartRef.current.scrollWidth,
-        windowHeight: chartRef.current.scrollHeight,
+        logging: false,
+        ignoreElements: (el) => el.tagName === 'BUTTON',
       })
       const link = document.createElement('a')
       link.download = `quickflow-${id}.png`
       link.href = canvas.toDataURL('image/png')
+      document.body.appendChild(link)
       link.click()
+      document.body.removeChild(link)
     } catch (e) {
       console.error('Download error:', e)
     }

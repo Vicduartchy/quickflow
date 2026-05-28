@@ -180,7 +180,7 @@ export function ScatterplotChart({ items }: { items: WorkItem[] }) {
         </div>
       </div>
       <ResponsiveContainer width="100%" height={380}>
-        <ScatterChart margin={{ top: 20, right: 20, bottom: 70, left: 20 }}>
+        <ScatterChart margin={{ top: 20, right: 120, bottom: 70, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={LIGHT} />
           <XAxis dataKey="x" type="number" domain={[minX, maxX]} tickFormatter={v => new Date(v).toLocaleDateString()} tick={{ fill: SALMON, fontSize: 10 }} tickLine={false} label={{ value: t.completionDate, position: 'insideBottom', offset: -55, fill: SALMON, fontSize: 11 }} />
           <YAxis dataKey="y" type="number" tick={{ fill: SALMON, fontSize: 11 }} tickLine={false} label={{ value: t.cycleTimeDays, angle: -90, position: 'insideLeft', fill: SALMON, fontSize: 11 }} />
@@ -199,9 +199,9 @@ export function ScatterplotChart({ items }: { items: WorkItem[] }) {
           <Scatter name=">P95" data={byColor.above95 as object[]} fill={DOT_COLORS.above95} fillOpacity={0.85} />
           {/* Linha de tendência */}
           <Scatter name={lang === 'pt-BR' ? 'Tendência' : 'Trend'} data={trendData} fill="none" line={{ stroke: GREEN, strokeWidth: 2, strokeDasharray: '6 3' }} legendType="line" />
-          <ReferenceLine y={p50} stroke={DOT_COLORS.below50} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P50: ${p50}d`, fill: DOT_COLORS.below50, fontSize: 10, position: 'insideRight', fontWeight: 700 }} />
-          <ReferenceLine y={p85} stroke={DOT_COLORS.p85_95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P85: ${p85}d`, fill: DOT_COLORS.p85_95, fontSize: 10, position: 'insideRight', fontWeight: 700 }} />
-          <ReferenceLine y={p95} stroke={DOT_COLORS.above95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P95: ${p95}d`, fill: DOT_COLORS.above95, fontSize: 10, position: 'insideRight', fontWeight: 700 }} />
+          <ReferenceLine y={p50} stroke={DOT_COLORS.below50} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P50 ${p50}d`, fill: DOT_COLORS.below50, fontSize: 10, position: 'right', fontWeight: 700, offset: 5 }} />
+          <ReferenceLine y={p85} stroke={DOT_COLORS.p85_95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P85 ${p85}d`, fill: DOT_COLORS.p85_95, fontSize: 10, position: 'right', fontWeight: 700, offset: 5 }} />
+          <ReferenceLine y={p95} stroke={DOT_COLORS.above95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P95 ${p95}d`, fill: DOT_COLORS.above95, fontSize: 10, position: 'right', fontWeight: 700, offset: 5 }} />
         </ScatterChart>
       </ResponsiveContainer>
       <div className="mt-3 p-3 bg-[#F2C5BB]/20 border border-[#F2C5BB] rounded-xl text-xs text-[#092140]">{trendInsight}</div>
