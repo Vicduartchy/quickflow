@@ -6,7 +6,7 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#F2C5BB] shadow-sm">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/quickflow/vic-logo.svg" alt="Vic Duarte" className="h-8" />
+          <img src="/quickflow/vic-logo.png" alt="Vic Duarte" className="h-8" />
           <div className="w-px h-6 bg-[#F2C5BB]" />
           <div className="flex items-center gap-1.5">
             <div className="w-5 h-5 rounded-md bg-[#BF452A] flex items-center justify-center">

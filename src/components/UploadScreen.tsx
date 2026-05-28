@@ -82,7 +82,7 @@ export function UploadScreen() {
 
         {/* Author credit */}
         <div className="mt-6 p-4 bg-white border border-[#F2C5BB] rounded-2xl flex items-center gap-4">
-          <img src="/quickflow/vic-logo.svg" alt="Vic Duarte" className="h-8 shrink-0" />
+          <img src="/quickflow/vic-logo.png" alt="Vic Duarte" className="h-8 shrink-0" />
           <div>
             <p className="text-[#092140] text-sm">{authorText}</p>
             <a href="https://vicduarte.site" target="_blank" rel="noopener noreferrer" className="text-[#BF452A] text-sm font-semibold hover:underline">{authorLink}</a>
