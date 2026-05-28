@@ -184,7 +184,14 @@ export function ScatterplotChart({ items }: { items: WorkItem[] }) {
           <CartesianGrid strokeDasharray="3 3" stroke={LIGHT} />
           <XAxis dataKey="x" type="number" domain={[minX, maxX]} tickFormatter={v => new Date(v).toLocaleDateString()} tick={{ fill: SALMON, fontSize: 10 }} tickLine={false} label={{ value: t.completionDate, position: 'insideBottom', offset: -55, fill: SALMON, fontSize: 11 }} />
           <YAxis dataKey="y" type="number" tick={{ fill: SALMON, fontSize: 11 }} tickLine={false} label={{ value: t.cycleTimeDays, angle: -90, position: 'insideLeft', fill: SALMON, fontSize: 11 }} />
-          <Tooltip cursor={{ strokeDasharray: '3 3', stroke: TERRA }} {...TT} labelFormatter={v => new Date(v).toLocaleDateString()} />
+          <Tooltip cursor={{ strokeDasharray: '3 3', stroke: TERRA }}
+            contentStyle={TT.contentStyle} labelStyle={TT.labelStyle} itemStyle={TT.itemStyle}
+            labelFormatter={(v) => `${lang === 'pt-BR' ? 'Conclusão' : 'Completed'}: ${new Date(v).toLocaleDateString()}`}
+            formatter={(value, name) => {
+              if (name === 'y') return [`${value}d`, lang === 'pt-BR' ? 'Cycle Time' : 'Cycle Time']
+              return [value, name]
+            }}
+          />
           <Legend wrapperStyle={{ color: NAVY, fontSize: 12, paddingTop: 4 }} verticalAlign="top" />
           <Scatter name="≤P50" data={byColor.below50 as object[]} fill={DOT_COLORS.below50} fillOpacity={0.85} />
           <Scatter name="P50–P85" data={byColor.p50_85 as object[]} fill={DOT_COLORS.p50_85} fillOpacity={0.85} />
@@ -192,9 +199,9 @@ export function ScatterplotChart({ items }: { items: WorkItem[] }) {
           <Scatter name=">P95" data={byColor.above95 as object[]} fill={DOT_COLORS.above95} fillOpacity={0.85} />
           {/* Linha de tendência */}
           <Scatter name={lang === 'pt-BR' ? 'Tendência' : 'Trend'} data={trendData} fill="none" line={{ stroke: GREEN, strokeWidth: 2, strokeDasharray: '6 3' }} legendType="line" />
-          <ReferenceLine y={p50} stroke={DOT_COLORS.below50} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P50: ${p50}d`, fill: DOT_COLORS.below50, fontSize: 11, position: 'insideTopLeft', fontWeight: 700 }} />
-          <ReferenceLine y={p85} stroke={DOT_COLORS.p85_95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P85: ${p85}d`, fill: DOT_COLORS.p85_95, fontSize: 11, position: 'insideTopLeft', fontWeight: 700 }} />
-          <ReferenceLine y={p95} stroke={DOT_COLORS.above95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P95: ${p95}d`, fill: DOT_COLORS.above95, fontSize: 11, position: 'insideTopLeft', fontWeight: 700 }} />
+          <ReferenceLine y={p50} stroke={DOT_COLORS.below50} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P50: ${p50}d`, fill: DOT_COLORS.below50, fontSize: 10, position: 'insideRight', fontWeight: 700 }} />
+          <ReferenceLine y={p85} stroke={DOT_COLORS.p85_95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P85: ${p85}d`, fill: DOT_COLORS.p85_95, fontSize: 10, position: 'insideRight', fontWeight: 700 }} />
+          <ReferenceLine y={p95} stroke={DOT_COLORS.above95} strokeWidth={2} strokeDasharray="5 3" label={{ value: `P95: ${p95}d`, fill: DOT_COLORS.above95, fontSize: 10, position: 'insideRight', fontWeight: 700 }} />
         </ScatterChart>
       </ResponsiveContainer>
       <div className="mt-3 p-3 bg-[#F2C5BB]/20 border border-[#F2C5BB] rounded-xl text-xs text-[#092140]">{trendInsight}</div>
@@ -564,18 +571,24 @@ export function ThroughputRunChart({ items }: { items: WorkItem[] }) {
         </ResponsiveContainer>
       ) : (
         <div>
-          <p className="text-xs text-[#D99789] mb-2 text-center">{lang === 'pt-BR' ? `Distribuição de itens entregues por ${grpLabel.slice(0,-1)}` : `Items delivered per ${grpLabel.slice(0,-1)}`}</p>
-          <ResponsiveContainer width="100%" height={360}>
-            <PieChart>
-              <Pie data={data} dataKey="count" nameKey="label" cx="50%" cy="45%" outerRadius={140} innerRadius={70}
-                label={({ name, value, percent }: { name?: string; value?: number; percent?: number }) =>
-                  percent && percent > 0.04 ? `${name ?? ''}: ${value ?? ''}` : ''
+          <p className="text-xs text-[#D99789] mb-2 text-center">
+            {typeBreakdown.length > 1
+              ? (lang === 'pt-BR' ? 'Distribuição por tipo de item' : 'Distribution by item type')
+              : (lang === 'pt-BR' ? 'Distribuição por volume de entregas' : 'Distribution by delivery volume')}
+          </p>
+          <ResponsiveContainer width="100%" height={380}>
+            <PieChart margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
+              <Pie
+                data={typeBreakdown.length > 1 ? typeBreakdown.map(b => ({ name: b.type, value: b.count, fill: b.fill })) : TP_RANGES.map((range, idx) => ({ name: range.label, value: data.filter(d => d.count >= range.min && d.count < range.max).reduce((s, d) => s + d.count, 0), fill: STATUS_COLORS[idx % STATUS_COLORS.length] })).filter(d => d.value > 0)}
+                dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={130} innerRadius={65}
+                label={({ name, percent }: { name?: string; percent?: number }) =>
+                  percent && percent > 0.05 ? `${name ?? ''} (${Math.round((percent ?? 0) * 100)}%)` : ''
                 }
                 labelLine={true}>
-                {data.map((d, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
+                {(typeBreakdown.length > 1 ? typeBreakdown : TP_RANGES).map((_, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
               </Pie>
-              <Tooltip {...TT} formatter={v => [v, axisLabel]} />
-              <Legend wrapperStyle={{ color: NAVY, fontSize: 12 }} />
+              <Tooltip {...TT} formatter={(v, name) => [v, name]} />
+              <Legend wrapperStyle={{ color: NAVY, fontSize: 11 }} />
             </PieChart>
           </ResponsiveContainer>
         </div>

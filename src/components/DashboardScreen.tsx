@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useApp } from '../lib/context'
 import type { GroupBy } from '../lib/context'
 import { ChartCard } from './ui/ChartCard'
+import { MultiSelect } from './ui/MultiSelect'
 import {
   CFDChart, ScatterplotChart, BreakdownChart,
   HistogramChart, AgingChart, ThroughputRunChart, ThroughputHistogramChart
@@ -85,9 +86,6 @@ export function DashboardScreen() {
     ? { day:'Dias', week:'Semanas', month:'Meses', year:'Anos' }
     : { day:'Days', week:'Weeks', month:'Months', year:'Years' }
 
-  const toggleStatus = (s: string) => setSelectedStatuses(selectedStatuses.includes(s) ? selectedStatuses.filter(x=>x!==s) : [...selectedStatuses,s])
-  const toggleType = (s: string) => setSelectedTypes(selectedTypes.includes(s) ? selectedTypes.filter(x=>x!==s) : [...selectedTypes,s])
-  const toggleTeam = (s: string) => setSelectedTeams(selectedTeams.includes(s) ? selectedTeams.filter(x=>x!==s) : [...selectedTeams,s])
 
   const cancelLabel = lang==='pt-BR'?'Cancelar':'Cancel'
   const confirmLabel = lang==='pt-BR'?'Confirmar':'Confirm'
@@ -130,42 +128,36 @@ export function DashboardScreen() {
           </div>
         </div>
 
-        {/* Times/Squads */}
-        {allTeams.length > 0 && (
-          <div>
-            <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por time/squad':'Filter by team/squad'}</label>
-            <div className="flex flex-wrap gap-2">
-              {allTeams.map(s=>(
-                <button key={s} onClick={()=>toggleTeam(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedTeams.includes(s)?'bg-[#092140] text-white border-[#092140]':'border-[#D99789] text-[#D99789] hover:border-[#092140] hover:text-[#092140]'}`}>{s}</button>
-              ))}
-              {selectedTeams.length>0 && <button onClick={()=>setSelectedTeams([])} className="px-3 py-1 text-xs rounded-full border border-[#BF452A] text-[#BF452A] hover:bg-[#BF452A] hover:text-white transition-colors font-medium">✕ {lang==='pt-BR'?'Limpar':'Clear'}</button>}
-            </div>
-          </div>
-        )}
-
-        {/* Status */}
-        {allStatuses.length > 0 && (
-          <div>
-            <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por status':'Filter by status'}</label>
-            <div className="flex flex-wrap gap-2">
-              {allStatuses.map(s=>(
-                <button key={s} onClick={()=>toggleStatus(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedStatuses.includes(s)?'bg-[#BF452A] text-white border-[#BF452A]':'border-[#D99789] text-[#D99789] hover:border-[#BF452A] hover:text-[#BF452A]'}`}>{s}</button>
-              ))}
-              {selectedStatuses.length>0 && <button onClick={()=>setSelectedStatuses([])} className="px-3 py-1 text-xs rounded-full border border-[#BF452A] text-[#BF452A] hover:bg-[#BF452A] hover:text-white transition-colors font-medium">✕ {lang==='pt-BR'?'Limpar':'Clear'}</button>}
-            </div>
-          </div>
-        )}
-
-        {/* Tipos */}
-        {allTypes.length > 0 && (
-          <div>
-            <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por tipo':'Filter by type'}</label>
-            <div className="flex flex-wrap gap-2">
-              {allTypes.map(s=>(
-                <button key={s} onClick={()=>toggleType(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedTypes.includes(s)?'bg-[#D99789] text-white border-[#D99789]':'border-[#D99789] text-[#D99789] hover:border-[#092140] hover:text-[#092140]'}`}>{s}</button>
-              ))}
-              {selectedTypes.length>0 && <button onClick={()=>setSelectedTypes([])} className="px-3 py-1 text-xs rounded-full border border-[#BF452A] text-[#BF452A] hover:bg-[#BF452A] hover:text-white transition-colors font-medium">✕ {lang==='pt-BR'?'Limpar':'Clear'}</button>}
-            </div>
+        {/* Dropdowns de filtro */}
+        {(allTeams.length > 0 || allStatuses.length > 0 || allTypes.length > 0) && (
+          <div className="flex flex-wrap gap-4 items-start">
+            {allTeams.length > 0 && (
+              <MultiSelect
+                label={lang==='pt-BR'?'Time / Squad':'Team / Squad'}
+                options={allTeams}
+                selected={selectedTeams}
+                onChange={setSelectedTeams}
+                lang={lang}
+              />
+            )}
+            {allStatuses.length > 0 && (
+              <MultiSelect
+                label={lang==='pt-BR'?'Status':'Status'}
+                options={allStatuses}
+                selected={selectedStatuses}
+                onChange={setSelectedStatuses}
+                lang={lang}
+              />
+            )}
+            {allTypes.length > 0 && (
+              <MultiSelect
+                label={lang==='pt-BR'?'Tipo de item':'Item type'}
+                options={allTypes}
+                selected={selectedTypes}
+                onChange={setSelectedTypes}
+                lang={lang}
+              />
+            )}
           </div>
         )}
       </div>
