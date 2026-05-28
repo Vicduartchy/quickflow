@@ -180,9 +180,9 @@ export function ScatterplotChart({ items }: { items: WorkItem[] }) {
         </div>
       </div>
       <ResponsiveContainer width="100%" height={380}>
-        <ScatterChart margin={{ top: 20, right: 20, bottom: 50, left: 20 }}>
+        <ScatterChart margin={{ top: 20, right: 20, bottom: 70, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={LIGHT} />
-          <XAxis dataKey="x" type="number" domain={[minX, maxX]} tickFormatter={v => new Date(v).toLocaleDateString()} tick={{ fill: SALMON, fontSize: 10 }} tickLine={false} label={{ value: t.completionDate, position: 'insideBottom', offset: -35, fill: SALMON, fontSize: 11 }} />
+          <XAxis dataKey="x" type="number" domain={[minX, maxX]} tickFormatter={v => new Date(v).toLocaleDateString()} tick={{ fill: SALMON, fontSize: 10 }} tickLine={false} label={{ value: t.completionDate, position: 'insideBottom', offset: -55, fill: SALMON, fontSize: 11 }} />
           <YAxis dataKey="y" type="number" tick={{ fill: SALMON, fontSize: 11 }} tickLine={false} label={{ value: t.cycleTimeDays, angle: -90, position: 'insideLeft', fill: SALMON, fontSize: 11 }} />
           <Tooltip cursor={{ strokeDasharray: '3 3', stroke: TERRA }} {...TT} labelFormatter={v => new Date(v).toLocaleDateString()} />
           <Legend wrapperStyle={{ color: NAVY, fontSize: 12, paddingTop: 4 }} verticalAlign="top" />
@@ -252,7 +252,11 @@ export function BreakdownChart({ items }: { items: WorkItem[] }) {
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <PieChart>
-            <Pie data={data} dataKey="avg" nameKey="stage" cx="50%" cy="45%" outerRadius={150} innerRadius={60} label={false}>
+            <Pie data={data} dataKey="avg" nameKey="stage" cx="50%" cy="45%" outerRadius={150} innerRadius={60}
+              label={({ name, value, percent }: { name?: string; value?: number; percent?: number }) =>
+                percent && percent > 0.04 ? `${name ?? ''}: ${value ?? ''}d` : ''
+              }
+              labelLine={true}>
               {data.map((d, i) => <Cell key={i} fill={d.fill} />)}
             </Pie>
             <Tooltip {...TT} formatter={v => [`${v} ${t.days}`, t.avgDays]} />
@@ -560,11 +564,15 @@ export function ThroughputRunChart({ items }: { items: WorkItem[] }) {
         </ResponsiveContainer>
       ) : (
         <div>
-          <p className="text-xs text-[#D99789] mb-2 text-center">{lang === 'pt-BR' ? `Agrupado por faixas de volume (${grpLabel})` : `Grouped by volume ranges (${grpLabel})`}</p>
+          <p className="text-xs text-[#D99789] mb-2 text-center">{lang === 'pt-BR' ? `Distribuição de itens entregues por ${grpLabel.slice(0,-1)}` : `Items delivered per ${grpLabel.slice(0,-1)}`}</p>
           <ResponsiveContainer width="100%" height={360}>
             <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="45%" outerRadius={140} innerRadius={70} label={false}>
-                {pieData.map((d, i) => <Cell key={i} fill={d.fill} />)}
+              <Pie data={data} dataKey="count" nameKey="label" cx="50%" cy="45%" outerRadius={140} innerRadius={70}
+                label={({ name, value, percent }: { name?: string; value?: number; percent?: number }) =>
+                  percent && percent > 0.04 ? `${name ?? ''}: ${value ?? ''}` : ''
+                }
+                labelLine={true}>
+                {data.map((d, i) => <Cell key={i} fill={STATUS_COLORS[i % STATUS_COLORS.length]} />)}
               </Pie>
               <Tooltip {...TT} formatter={v => [v, axisLabel]} />
               <Legend wrapperStyle={{ color: NAVY, fontSize: 12 }} />

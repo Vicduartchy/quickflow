@@ -1,15 +1,17 @@
 export interface WorkItem {
   id: string
   type?: string
+  team?: string
   entryDate: Date
   exitDate?: Date
   currentStatus?: string
-  cycleTime?: number // days
+  cycleTime?: number
 }
 
 export interface ColumnMapping {
   id: string | null
   type: string | null
+  team: string | null
   entryDate: string | null
   exitDate: string | null
   currentStatus: string | null
@@ -32,5 +34,4 @@ export interface ChartAvailability {
 }
 
 export type Language = 'pt-BR' | 'en-US'
-
 export type ChartId = 'cfd' | 'scatterplot' | 'breakdown' | 'histogram' | 'aging' | 'throughputRun' | 'throughputHistogram'

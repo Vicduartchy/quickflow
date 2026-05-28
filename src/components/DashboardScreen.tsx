@@ -9,13 +9,14 @@ import {
 import { getPercentile, getWeekKey, getGroupLabel } from '../lib/mapping'
 
 export function DashboardScreen() {
-  const { t, lang, workItems, availability, resetAll, groupBy, setGroupBy, selectedStatuses, setSelectedStatuses, selectedTypes, setSelectedTypes } = useApp()
+  const { t, lang, workItems, availability, resetAll, groupBy, setGroupBy, selectedStatuses, setSelectedStatuses, selectedTypes, setSelectedTypes, selectedTeams, setSelectedTeams } = useApp()
   const [confirmReset, setConfirmReset] = useState(false)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
 
   const allStatuses = useMemo(() => [...new Set(workItems.map(i => i.currentStatus).filter(Boolean))] as string[], [workItems])
   const allTypes = useMemo(() => [...new Set(workItems.map(i => i.type).filter(Boolean))] as string[], [workItems])
+  const allTeams = useMemo(() => [...new Set(workItems.map(i => i.team).filter(Boolean))] as string[], [workItems])
 
   const filteredItems = useMemo(() => {
     return workItems.filter(item => {
@@ -24,9 +25,10 @@ export function DashboardScreen() {
       if (dateTo && d > new Date(dateTo + 'T23:59:59')) return false
       if (selectedStatuses.length > 0 && item.currentStatus && !selectedStatuses.includes(item.currentStatus)) return false
       if (selectedTypes.length > 0 && item.type && !selectedTypes.includes(item.type)) return false
+      if (selectedTeams.length > 0 && item.team && !selectedTeams.includes(item.team)) return false
       return true
     })
-  }, [workItems, dateFrom, dateTo, selectedStatuses, selectedTypes])
+  }, [workItems, dateFrom, dateTo, selectedStatuses, selectedTypes, selectedTeams])
 
   if (!availability) return null
 
@@ -39,10 +41,7 @@ export function DashboardScreen() {
   const scatterInsights: string[] = []
   if (sortedCT.length > 0) scatterInsights.push(p85 > p50 * 2 ? t.insightHighVariability : t.insightStableFlow)
 
-  const inProgressAboveP85 = filteredItems.filter(i => {
-    if (i.exitDate) return false
-    return Math.round((Date.now() - i.entryDate.getTime()) / 86400000) > p85
-  }).length
+  const inProgressAboveP85 = filteredItems.filter(i => { if (i.exitDate) return false; return Math.round((Date.now() - i.entryDate.getTime()) / 86400000) > p85 }).length
   const agingInsights = inProgressAboveP85 > 0 ? [t.insightAgingWarning(inProgressAboveP85)] : []
 
   const wipItems = filteredItems.filter(i => !i.exitDate).length
@@ -69,7 +68,7 @@ export function DashboardScreen() {
   ] : []
 
   const tpHistInsights = weekValues.length > 0 ? [
-    lang==='pt-BR' ? `Mediana de ${tpMedian} itens/${getGroupLabel(groupBy,lang).slice(0,-1)}. Use para prever entregas futuras.` : `Median of ${tpMedian} items/${getGroupLabel(groupBy,lang).slice(0,-1)}. Use to forecast deliveries.`
+    lang==='pt-BR' ? `Mediana de ${tpMedian} itens/semana. Use para prever entregas futuras.` : `Median of ${tpMedian} items/week. Use to forecast deliveries.`
   ] : []
 
   const charts = [
@@ -88,6 +87,7 @@ export function DashboardScreen() {
 
   const toggleStatus = (s: string) => setSelectedStatuses(selectedStatuses.includes(s) ? selectedStatuses.filter(x=>x!==s) : [...selectedStatuses,s])
   const toggleType = (s: string) => setSelectedTypes(selectedTypes.includes(s) ? selectedTypes.filter(x=>x!==s) : [...selectedTypes,s])
+  const toggleTeam = (s: string) => setSelectedTeams(selectedTeams.includes(s) ? selectedTeams.filter(x=>x!==s) : [...selectedTeams,s])
 
   const cancelLabel = lang==='pt-BR'?'Cancelar':'Cancel'
   const confirmLabel = lang==='pt-BR'?'Confirmar':'Confirm'
@@ -106,7 +106,6 @@ export function DashboardScreen() {
         </button>
       </div>
 
-      {/* Controls */}
       <div className="mb-4 p-4 bg-white border border-[#F2C5BB] rounded-2xl space-y-4">
         {/* Período + Agrupamento */}
         <div className="flex flex-wrap gap-4 items-end">
@@ -131,26 +130,39 @@ export function DashboardScreen() {
           </div>
         </div>
 
+        {/* Times/Squads */}
+        {allTeams.length > 0 && (
+          <div>
+            <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por time/squad':'Filter by team/squad'}</label>
+            <div className="flex flex-wrap gap-2">
+              {allTeams.map(s=>(
+                <button key={s} onClick={()=>toggleTeam(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedTeams.includes(s)?'bg-[#092140] text-white border-[#092140]':'border-[#D99789] text-[#D99789] hover:border-[#092140] hover:text-[#092140]'}`}>{s}</button>
+              ))}
+              {selectedTeams.length>0 && <button onClick={()=>setSelectedTeams([])} className="px-3 py-1 text-xs rounded-full border border-[#BF452A] text-[#BF452A] hover:bg-[#BF452A] hover:text-white transition-colors font-medium">✕ {lang==='pt-BR'?'Limpar':'Clear'}</button>}
+            </div>
+          </div>
+        )}
+
         {/* Status */}
         {allStatuses.length > 0 && (
           <div>
             <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por status':'Filter by status'}</label>
             <div className="flex flex-wrap gap-2">
               {allStatuses.map(s=>(
-                <button key={s} onClick={()=>toggleStatus(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedStatuses.includes(s)?'bg-[#092140] text-white border-[#092140]':'border-[#D99789] text-[#D99789] hover:border-[#092140] hover:text-[#092140]'}`}>{s}</button>
+                <button key={s} onClick={()=>toggleStatus(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedStatuses.includes(s)?'bg-[#BF452A] text-white border-[#BF452A]':'border-[#D99789] text-[#D99789] hover:border-[#BF452A] hover:text-[#BF452A]'}`}>{s}</button>
               ))}
               {selectedStatuses.length>0 && <button onClick={()=>setSelectedStatuses([])} className="px-3 py-1 text-xs rounded-full border border-[#BF452A] text-[#BF452A] hover:bg-[#BF452A] hover:text-white transition-colors font-medium">✕ {lang==='pt-BR'?'Limpar':'Clear'}</button>}
             </div>
           </div>
         )}
 
-        {/* Times/Projetos */}
+        {/* Tipos */}
         {allTypes.length > 0 && (
           <div>
-            <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por time/projeto':'Filter by team/project'}</label>
+            <label className="text-xs font-semibold text-[#D99789] block mb-2">{lang==='pt-BR'?'Filtrar por tipo':'Filter by type'}</label>
             <div className="flex flex-wrap gap-2">
               {allTypes.map(s=>(
-                <button key={s} onClick={()=>toggleType(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedTypes.includes(s)?'bg-[#BF452A] text-white border-[#BF452A]':'border-[#D99789] text-[#D99789] hover:border-[#BF452A] hover:text-[#BF452A]'}`}>{s}</button>
+                <button key={s} onClick={()=>toggleType(s)} className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${selectedTypes.includes(s)?'bg-[#D99789] text-white border-[#D99789]':'border-[#D99789] text-[#D99789] hover:border-[#092140] hover:text-[#092140]'}`}>{s}</button>
               ))}
               {selectedTypes.length>0 && <button onClick={()=>setSelectedTypes([])} className="px-3 py-1 text-xs rounded-full border border-[#BF452A] text-[#BF452A] hover:bg-[#BF452A] hover:text-white transition-colors font-medium">✕ {lang==='pt-BR'?'Limpar':'Clear'}</button>}
             </div>

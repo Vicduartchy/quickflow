@@ -18,10 +18,11 @@ interface AppContextType {
   groupBy: GroupBy; setGroupBy: (g: GroupBy) => void
   selectedStatuses: string[]; setSelectedStatuses: (s: string[]) => void
   selectedTypes: string[]; setSelectedTypes: (s: string[]) => void
+  selectedTeams: string[]; setSelectedTeams: (s: string[]) => void
 }
 
 const AppContext = createContext<AppContextType | null>(null)
-const defaultMapping: ColumnMapping = { id: null, type: null, entryDate: null, exitDate: null, currentStatus: null }
+const defaultMapping: ColumnMapping = { id: null, type: null, team: null, entryDate: null, exitDate: null, currentStatus: null }
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [step, setStep] = useState<AppStep>('upload')
@@ -34,6 +35,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [groupBy, setGroupBy] = useState<GroupBy>('week')
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([])
 
   const toggleLang = () => setLang(l => l === 'pt-BR' ? 'en-US' : 'pt-BR')
   const t = translations[lang]
@@ -41,7 +43,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const resetAll = () => {
     setStep('upload'); setRawHeaders([]); setRawRows([]); setMapping(defaultMapping)
     setWorkItems([]); setAvailability(null); setGroupBy('week')
-    setSelectedStatuses([]); setSelectedTypes([])
+    setSelectedStatuses([]); setSelectedTypes([]); setSelectedTeams([])
   }
 
   return (
@@ -53,6 +55,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       groupBy, setGroupBy,
       selectedStatuses, setSelectedStatuses,
       selectedTypes, setSelectedTypes,
+      selectedTeams, setSelectedTeams,
     }}>
       {children}
     </AppContext.Provider>

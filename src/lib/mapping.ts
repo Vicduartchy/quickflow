@@ -3,7 +3,8 @@ import type { GroupBy } from './context'
 
 const FIELD_PATTERNS: Record<keyof ColumnMapping, RegExp[]> = {
   id: [/^(id|issue.?id|item.?id|task.?id|card.?id|ticket.?id|work.?item.?id|número|numero|#)$/i, /\bid\b/i],
-  type: [/^(type|tipo|issue.?type|tipo.?de.?item|tipo.?de.?issue|categoria|category|kind|work.?item.?type|team|time|projeto|project|squad)$/i],
+  type: [/^(type|tipo|issue.?type|tipo.?de.?item|tipo.?de.?issue|category|kind|work.?item.?type)$/i],
+  team: [/^(team|time|squad|equipe|area.?name|areaname|area|projeto|project|board|produto|product|tribe|tribo|grupo|group|domain|dominio|chapter|célula|celula)$/i, /(team|squad|equipe|area|time|projeto)/i],
   entryDate: [/^(created|created.?date|create.?date|data.?de.?criação|data.?criacao|data.?de.?entrada|entry.?date|start.?date|data.?inicio|data.?início|opened|open.?date|reported|raised|submitted|criado.?em|criado|created.?at|inicio)$/i, /(criad|created|started|opened|raised|entry|entrada|início|inicio)/i],
   exitDate: [/^(resolved|resolved.?date|resolution.?date|closed|closed.?date|close.?date|done|done.?date|completed|completed.?date|completion.?date|data.?de.?conclusão|data.?conclusao|data.?de.?fechamento|data.?fechamento|data.?resolução|data.?resolucao|finished|finish.?date|delivered|delivery.?date|data.?entrega|data.?de.?entrega|exitdate|exit.?date)$/i, /(resolv|closed|done|complet|finish|entregue|conclus|fechad|resolu)/i],
   currentStatus: [/^(status|estado|state|current.?status|status.?atual|column|coluna|stage|etapa|fase|phase|workflow.?state)$/i],
@@ -16,7 +17,7 @@ function scoreColumn(header: string, patterns: RegExp[]): number {
 }
 
 export function inferColumnMapping(headers: string[]): { mapping: ColumnMapping; confidence: MappingConfidence[] } {
-  const mapping: ColumnMapping = { id: null, type: null, entryDate: null, exitDate: null, currentStatus: null }
+  const mapping: ColumnMapping = { id: null, type: null, team: null, entryDate: null, exitDate: null, currentStatus: null }
   const confidence: MappingConfidence[] = []
   const used = new Set<string>()
   const fields = Object.keys(FIELD_PATTERNS) as (keyof ColumnMapping)[]
@@ -57,6 +58,7 @@ export function buildWorkItems(rows: Record<string, unknown>[], mapping: ColumnM
     return {
       id: mapping.id ? String(row[mapping.id] ?? index + 1) : String(index + 1),
       type: mapping.type ? String(row[mapping.type] ?? '') : undefined,
+      team: mapping.team ? String(row[mapping.team] ?? '') : undefined,
       entryDate, exitDate: exitDate ?? undefined,
       currentStatus: mapping.currentStatus ? String(row[mapping.currentStatus] ?? '') : undefined,
       cycleTime,
@@ -93,13 +95,8 @@ export function getGroupKey(date: Date, groupBy: GroupBy): string {
 
 export function formatAxisDate(key: string, groupBy: GroupBy): string {
   if (groupBy === 'year') return key
-  if (groupBy === 'month') {
-    const [year, month] = key.split('-')
-    return `${month}/${year.slice(2)}`
-  }
-  // day or week: YYYY-MM-DD → DD/MM/YY
-  const parts = key.split('-')
-  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`
+  if (groupBy === 'month') { const [y, m] = key.split('-'); return `${m}/${y.slice(2)}` }
+  const p = key.split('-'); if (p.length === 3) return `${p[2]}/${p[1]}/${p[0].slice(2)}`
   return key
 }
 

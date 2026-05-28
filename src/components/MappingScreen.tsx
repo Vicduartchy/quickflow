@@ -2,7 +2,7 @@ import { useApp } from '../lib/context'
 import { buildWorkItems, computeChartAvailability } from '../lib/mapping'
 import type { ColumnMapping } from '../types'
 
-const FIELDS: (keyof ColumnMapping)[] = ['id', 'type', 'entryDate', 'exitDate', 'currentStatus']
+const FIELDS: (keyof ColumnMapping)[] = ['id', 'type', 'team', 'entryDate', 'exitDate', 'currentStatus']
 const REQUIRED: (keyof ColumnMapping)[] = ['entryDate']
 
 export function MappingScreen() {
@@ -20,6 +20,22 @@ export function MappingScreen() {
   const backLabel = lang === 'pt-BR' ? '← Voltar' : '← Back'
   const noMapMsg = lang === 'pt-BR' ? 'Mapeie ao menos a "Data de entrada no fluxo" para continuar.' : 'Map at least the "Flow entry date" to continue.'
 
+  const fieldLabels: Record<keyof ColumnMapping, string> = lang === 'pt-BR' ? {
+    id: 'ID do item',
+    type: 'Tipo de item',
+    team: 'Time / Squad / Projeto',
+    entryDate: 'Data de entrada no fluxo',
+    exitDate: 'Data de conclusão',
+    currentStatus: 'Status atual',
+  } : {
+    id: 'Item ID',
+    type: 'Item type',
+    team: 'Team / Squad / Project',
+    entryDate: 'Flow entry date',
+    exitDate: 'Completion date',
+    currentStatus: 'Current status',
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-[#F2F2F2]">
       <div className="w-full max-w-2xl">
@@ -35,7 +51,7 @@ export function MappingScreen() {
             const isRequired = REQUIRED.includes(field)
             return (
               <div key={field} className="grid grid-cols-3 items-center px-6 py-4 border-b border-[#F2C5BB]/50 last:border-0 hover:bg-[#F2C5BB]/10 transition-colors">
-                <p className="text-[#092140] text-sm font-medium">{t.fields[field]}</p>
+                <p className="text-[#092140] text-sm font-medium">{fieldLabels[field]}</p>
                 <select value={mapping[field] ?? ''} onChange={(e) => handleChange(field, e.target.value)}
                   className="bg-[#F2F2F2] border border-[#D99789] text-[#092140] text-sm rounded-lg px-3 py-2 w-full focus:outline-none focus:border-[#BF452A] transition-colors">
                   <option value="">{t.mappingNotMapped}</option>
