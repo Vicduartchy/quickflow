@@ -158,13 +158,76 @@ export function DashboardScreen() {
         )}
       </div>
 
-      <div className="mb-6 p-3 bg-[#F2C5BB]/30 border border-[#D99789]/40 rounded-xl">
+      <div className="mb-4 p-3 bg-[#F2C5BB]/30 border border-[#D99789]/40 rounded-xl">
         <p className="text-[#BF452A] text-sm text-center">{t.uploadWarning}</p>
+      </div>
+
+      {/* Summary Panel */}
+      <div className="mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        {[
+          {
+            label: lang==='pt-BR' ? 'Cycle Time P85' : 'Cycle Time P85',
+            value: p85 > 0 ? `${p85}d` : '—',
+            sub: lang==='pt-BR' ? '85% entregues em até' : '85% delivered within',
+            color: '#BF452A',
+          },
+          {
+            label: lang==='pt-BR' ? 'Cycle Time P50' : 'Cycle Time P50',
+            value: p50 > 0 ? `${p50}d` : '—',
+            sub: lang==='pt-BR' ? 'mediana de entrega' : 'delivery median',
+            color: '#16A34A',
+          },
+          {
+            label: 'WIP',
+            value: String(filteredItems.filter(i => !i.exitDate).length),
+            sub: lang==='pt-BR' ? 'itens em andamento' : 'items in progress',
+            color: '#092140',
+          },
+          {
+            label: lang==='pt-BR' ? 'Throughput' : 'Throughput',
+            value: tpMedian > 0 ? `${tpMedian}` : '—',
+            sub: lang==='pt-BR' ? 'itens/semana (mediana)' : 'items/week (median)',
+            color: '#1D4ED8',
+          },
+          {
+            label: lang==='pt-BR' ? 'Concluídos' : 'Completed',
+            value: String(completedItems.length),
+            sub: lang==='pt-BR' ? 'no período filtrado' : 'in filtered period',
+            color: '#059669',
+          },
+          {
+            label: lang==='pt-BR' ? 'Total de itens' : 'Total items',
+            value: String(filteredItems.length),
+            sub: lang==='pt-BR' ? 'na base filtrada' : 'in filtered base',
+            color: '#7C3AED',
+          },
+        ].map((card, i) => (
+          <div key={i} className="bg-white border border-[#F2C5BB] rounded-2xl p-4 text-center shadow-sm">
+            <p className="text-xs font-semibold text-[#D99789] mb-1">{card.label}</p>
+            <p className="text-2xl font-bold" style={{ color: card.color }}>{card.value}</p>
+            <p className="text-xs text-[#D99789] mt-1 leading-tight">{card.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart navigation anchors */}
+      <div className="mb-6 bg-white border border-[#F2C5BB] rounded-2xl px-4 py-2 flex gap-1 flex-wrap sticky top-14 z-30 shadow-sm">
+        {charts.filter(c => c.avail.available).map(({ id }) => (
+          <button
+            key={id}
+            onClick={() => document.getElementById(`chart-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="px-3 py-1.5 text-xs font-medium text-[#D99789] hover:text-[#BF452A] hover:bg-[#F2C5BB]/20 rounded-lg transition-colors whitespace-nowrap"
+          >
+            {t.charts[id]}
+          </button>
+        ))}
       </div>
 
       <div className="grid gap-6">
         {charts.map(({id,avail,chart,insights})=>(
-          <ChartCard key={id} id={id} title={t.charts[id]} description={t.descriptions[id]} available={avail.available} missing={avail.missing} insights={insights}>{chart}</ChartCard>
+          <div key={id} id={`chart-${id}`} className="scroll-mt-28">
+            <ChartCard id={id} title={t.charts[id]} description={t.descriptions[id]} available={avail.available} missing={avail.missing} insights={insights}>{chart}</ChartCard>
+          </div>
         ))}
       </div>
 
