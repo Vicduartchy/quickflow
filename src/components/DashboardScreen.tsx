@@ -5,7 +5,7 @@ import { ChartCard } from './ui/ChartCard'
 import { MultiSelect } from './ui/MultiSelect'
 import {
   CFDChart, ScatterplotChart, BreakdownChart,
-  HistogramChart, AgingChart, ThroughputRunChart, ThroughputHistogramChart
+  HistogramChart, AgingChart, ThroughputRunChart
 } from './charts/Charts'
 import { getPercentile, getWeekKey, getGroupLabel } from '../lib/mapping'
 
@@ -68,9 +68,6 @@ export function DashboardScreen() {
     ...(p85 > p50*2 ? [lang==='pt-BR'?'Cauda longa: alta variabilidade no processo.':'Long tail: high process variability.'] : [])
   ] : []
 
-  const tpHistInsights = weekValues.length > 0 ? [
-    lang==='pt-BR' ? `Mediana de ${tpMedian} itens/semana. Use para prever entregas futuras.` : `Median of ${tpMedian} items/week. Use to forecast deliveries.`
-  ] : []
 
   const charts = [
     { id: 'cfd' as const, avail: availability.cfd, chart: <CFDChart items={filteredItems} />, insights: cfdInsights },
@@ -79,7 +76,6 @@ export function DashboardScreen() {
     { id: 'histogram' as const, avail: availability.histogram, chart: <HistogramChart items={filteredItems} />, insights: histInsights },
     { id: 'aging' as const, avail: availability.aging, chart: <AgingChart items={filteredItems} />, insights: agingInsights },
     { id: 'throughputRun' as const, avail: availability.throughputRun, chart: <ThroughputRunChart items={filteredItems} />, insights: throughputInsights },
-    { id: 'throughputHistogram' as const, avail: availability.throughputHistogram, chart: <ThroughputHistogramChart items={filteredItems} />, insights: tpHistInsights },
   ]
 
   const groupLabels: Record<GroupBy, string> = lang==='pt-BR'

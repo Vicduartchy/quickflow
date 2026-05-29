@@ -186,10 +186,17 @@ export function ScatterplotChart({ items }: { items: WorkItem[] }) {
           <YAxis dataKey="y" type="number" tick={{ fill: SALMON, fontSize: 11 }} tickLine={false} label={{ value: t.cycleTimeDays, angle: -90, position: 'insideLeft', fill: SALMON, fontSize: 11 }} />
           <Tooltip cursor={{ strokeDasharray: '3 3', stroke: TERRA }}
             contentStyle={TT.contentStyle} labelStyle={TT.labelStyle} itemStyle={TT.itemStyle}
-            labelFormatter={(v) => `${lang === 'pt-BR' ? 'Conclusão' : 'Completed'}: ${new Date(v).toLocaleDateString()}`}
-            formatter={(value, name) => {
-              if (name === 'y') return [`${value}d`, lang === 'pt-BR' ? 'Cycle Time' : 'Cycle Time']
-              return [value, name]
+            content={({ active, payload }) => {
+              if (!active || !payload?.[0]) return null
+              const d = payload[0].payload as { x: number; y: number; id: string; type?: string }
+              return (
+                <div style={{ backgroundColor: '#092140', border: '1px solid #BF452A', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 12 }}>
+                  <p style={{ fontWeight: 700, marginBottom: 4 }}>{d.id}</p>
+                  {d.type && <p style={{ color: '#D99789', marginBottom: 2 }}>{d.type}</p>}
+                  <p>{lang === 'pt-BR' ? 'Conclusão' : 'Completed'}: {new Date(d.x).toLocaleDateString()}</p>
+                  <p>Cycle Time: <strong>{d.y}d</strong></p>
+                </div>
+              )
             }}
           />
           <Legend wrapperStyle={{ color: NAVY, fontSize: 12, paddingTop: 4 }} verticalAlign="top" />
