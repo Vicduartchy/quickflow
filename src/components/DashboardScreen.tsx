@@ -10,7 +10,7 @@ import {
 import { getPercentile, getWeekKey, getGroupLabel } from '../lib/mapping'
 
 export function DashboardScreen() {
-  const { t, lang, workItems, availability, resetAll, groupBy, setGroupBy, selectedStatuses, setSelectedStatuses, selectedTypes, setSelectedTypes, selectedTeams, setSelectedTeams } = useApp()
+  const { t, lang, workItems, availability, resetAll, groupBy, setGroupBy, selectedStatuses, setSelectedStatuses, selectedTypes, setSelectedTypes, selectedTeams, setSelectedTeams, flowPolicy } = useApp()
   const [confirmReset, setConfirmReset] = useState(false)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
@@ -161,6 +161,54 @@ export function DashboardScreen() {
       <div className="mb-4 p-3 bg-[#F2C5BB]/30 border border-[#D99789]/40 rounded-xl">
         <p className="text-[#BF452A] text-sm text-center">{t.uploadWarning}</p>
       </div>
+
+      {/* Flow Policy Banner */}
+      {flowPolicy.statusConfigs.length > 0 && (() => {
+        const wip = flowPolicy.statusConfigs.filter(c => c.category === 'wip')
+        const backlog = flowPolicy.statusConfigs.filter(c => c.category === 'backlog')
+        const done = flowPolicy.statusConfigs.filter(c => c.category === 'done')
+        const upstream = wip.filter(c => c.layer === 'upstream')
+        const downstream = wip.filter(c => c.layer === 'downstream')
+        if (wip.length === 0 && backlog.length === 0) return null
+        return (
+          <div className="mb-4 p-4 bg-white border border-[#F2C5BB] rounded-2xl shadow-sm">
+            <p className="text-xs font-bold text-[#092140] mb-3">{lang === 'pt-BR' ? '⚙️ Política de fluxo configurada' : '⚙️ Flow policy configured'}</p>
+            <div className="flex flex-wrap gap-4 text-xs">
+              {backlog.length > 0 && (
+                <div>
+                  <span className="font-semibold text-[#6B7280]">{lang === 'pt-BR' ? 'Backlog:' : 'Backlog:'} </span>
+                  <span className="text-[#092140]">{backlog.map(c => c.status).join(', ')}</span>
+                </div>
+              )}
+              {wip.length > 0 && (
+                <div>
+                  <span className="font-semibold text-[#1D4ED8]">WIP: </span>
+                  <span className="text-[#092140]">{wip.map(c => c.status).join(', ')}</span>
+                </div>
+              )}
+              {done.length > 0 && (
+                <div>
+                  <span className="font-semibold text-[#059669]">{lang === 'pt-BR' ? 'Concluído:' : 'Done:'} </span>
+                  <span className="text-[#092140]">{done.map(c => c.status).join(', ')}</span>
+                </div>
+              )}
+              {upstream.length > 0 && (
+                <div>
+                  <span className="font-semibold text-[#7C3AED]">Upstream: </span>
+                  <span className="text-[#092140]">{upstream.map(c => c.status).join(', ')}</span>
+                </div>
+              )}
+              {downstream.length > 0 && (
+                <div>
+                  <span className="font-semibold text-[#BF452A]">Downstream: </span>
+                  <span className="text-[#092140]">{downstream.map(c => c.status).join(', ')}</span>
+                </div>
+              )}
+            </div>
+
+          </div>
+        )
+      })()}
 
       {/* Summary Panel */}
       <div className="mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

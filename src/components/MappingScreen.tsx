@@ -13,7 +13,7 @@ export function MappingScreen() {
   const handleGenerate = () => {
     setWorkItems(buildWorkItems(rawRows, mapping))
     setAvailability(computeChartAvailability(mapping))
-    setStep('dashboard')
+    setStep('policy')
   }
 
   const canGenerate = !!mapping.entryDate

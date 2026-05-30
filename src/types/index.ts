@@ -23,6 +23,19 @@ export interface MappingConfidence {
   confidence: 'high' | 'medium' | 'low'
 }
 
+export type StatusCategory = 'backlog' | 'wip' | 'done' | 'unclassified'
+export type FlowLayer = 'upstream' | 'downstream' | 'none'
+
+export interface StatusConfig {
+  status: string
+  category: StatusCategory
+  layer: FlowLayer
+}
+
+export interface FlowPolicy {
+  statusConfigs: StatusConfig[]
+}
+
 export interface ChartAvailability {
   cfd: { available: boolean; missing: string[] }
   scatterplot: { available: boolean; missing: string[] }
