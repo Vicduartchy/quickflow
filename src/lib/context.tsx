@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useState } from 'react'
 import type { WorkItem, ColumnMapping, FlowPolicy, GroupBy, Step } from '../types'
 import { translations } from '../i18n/translations'
-import type { Lang, Translations } from '../i18n/translations'
+import type { Lang } from '../i18n/translations'
 
 interface AppContextType {
   step: Step
   setStep: (s: Step) => void
   lang: Lang
   toggleLang: () => void
-  t: Translations
+  t: (typeof translations)[Lang]
   rawRows: Record<string, unknown>[]
   setRawRows: (rows: Record<string, unknown>[]) => void
   headers: string[]

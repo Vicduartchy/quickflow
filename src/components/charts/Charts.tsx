@@ -221,7 +221,7 @@ function BreakdownChart({ items }: { items: WorkItem[] }) {
             <YAxis type="category" dataKey="status" tick={{ fontSize: 11, fill: C.navy }} width={95} />
             <Tooltip formatter={(v) => [`${v} dias`, 'Média']} />
             <Bar dataKey="avg" fill={C.terra} radius={[0,3,3,0]}
-              label={{ position: 'right', fontSize: 10, fill: C.navy, formatter: (v: number) => `${v}d` }} />
+              label={{ position: 'right', fontSize: 10, fill: C.navy, formatter: (v: unknown) => `${v}d` }} />
           </BarChart>
         </ResponsiveContainer>
       )}
