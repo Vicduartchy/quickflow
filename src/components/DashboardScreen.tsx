@@ -3,6 +3,7 @@ import { useApp } from "../lib/context"
 import { getPercentile, getGroupLabel, computeThroughputMedian } from "../lib/mapping"
 import type { GroupBy } from "../types"
 import Charts from "./charts/Charts"
+import InsightsPanel from "./InsightsPanel"
 
 export default function DashboardScreen() {
   const {
@@ -152,6 +153,7 @@ export default function DashboardScreen() {
             ℹ️ Último período incompleto — excluído do cálculo do Throughput mediano ({tpMedian}/semana).
           </div>
         )}
+        <InsightsPanel items={filteredItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />
         <Charts items={filteredItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />
       </main>
     </div>
