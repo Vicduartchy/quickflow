@@ -25,6 +25,9 @@ export default function DashboardScreen() {
     return workItems.filter(item => {
       if (dateFrom && item.entryDate < dateFrom) return false
       if (dateTo && item.entryDate > dateTo) return false
+      if (selectedTeams.length > 0 && item.team && !selectedTeams.includes(item.team)) return false
+      if (selectedStatuses.length > 0 && item.currentStatus && !selectedStatuses.includes(item.currentStatus)) return false
+      if (selectedTypes.length > 0 && item.type && !selectedTypes.includes(item.type)) return false
       return true
     })
   }, [workItems, dateFrom, dateTo, selectedTeams, selectedStatuses, selectedTypes])
@@ -34,6 +37,7 @@ export default function DashboardScreen() {
   const wip = filteredItems.filter(i => i.cycleTime === undefined)
   const hasNoConcluded = concluded.length === 0
 
+  const ctValues = concludedForMetrics.map(i => i.cycleTime!).sort((a, b) => a - b)
   const ctP50 = getPercentile(ctValues, 50)
   const ctP85 = getPercentile(ctValues, 85)
   const ctP95 = getPercentile(ctValues, 95)

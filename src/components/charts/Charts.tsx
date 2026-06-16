@@ -7,21 +7,22 @@ import {
 import type { WorkItem, GroupBy } from '../../types'
 import { getPercentile, getGroupKey, getGroupLabel, getDatasetMaxDate } from '../../lib/mapping'
 
-interface Props { items: WorkItem[]; groupBy: GroupBy }
+interface Props { items: WorkItem[]; groupBy: GroupBy; excludeZeroCT?: boolean }
 
 const C = { navy: '#092140', terra: '#BF452A', salmon: '#D99789', blush: '#F2C5BB' }
 
-export default function Charts({ items, groupBy }: Props) {
+export default function Charts({ items, groupBy, excludeZeroCT }: Props) {
   const concluded = items.filter(i => i.cycleTime !== undefined)
+  const concludedFiltered = excludeZeroCT ? concluded.filter(i => i.cycleTime! > 0) : concluded
   const wip = items.filter(i => i.cycleTime === undefined)
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-      <ScatterplotChart items={concluded} groupBy={groupBy} />
-      <ThroughputRunChart items={concluded} groupBy={groupBy} />
+      <ScatterplotChart items={concludedFiltered} groupBy={groupBy} />
+      <ThroughputRunChart items={concludedFiltered} groupBy={groupBy} />
       <AgingChart items={wip} allItems={items} />
-      <HistogramChart items={concluded} />
+      <HistogramChart items={concludedFiltered} />
       <CFDChart items={items} groupBy={groupBy} />
-      <BreakdownChart items={concluded} />
+      <BreakdownChart items={concludedFiltered} />
     </div>
   )
 }
