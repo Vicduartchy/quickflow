@@ -189,74 +189,138 @@ function AgingChart({ items }: { items: WorkItem[] }) {
   // Sempre usa a data de hoje como referência — itens sem Closed Date estão em andamento agora
   const refDate = new Date()
 
-  // Obtém statuses únicos ordenados
+  // Obtém statuses únicos ordenados por quantidade de itens (mais cheio primeiro)
   const statuses = useMemo(() => {
-    const s = [...new Set(items.map(i => i.currentStatus ?? 'Unknown'))]
-    return s.sort()
+    const counts = new Map<string, number>()
+    for (const i of items) {
+      const s = i.currentStatus ?? 'Unknown'
+      counts.set(s, (counts.get(s) ?? 0) + 1)
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([s]) => s)
   }, [items])
 
-  // Converte status em índice numérico + jitter para separar os pontos visualmente
-  const data = useMemo(() => items.map((i, idx) => {
+  // Calcula idade de cada item
+  const dataWithAge = useMemo(() => items.map((i, idx) => {
     const status = i.currentStatus ?? 'Unknown'
     const statusIdx = statuses.indexOf(status)
-    // Jitter determinístico baseado no índice do item para espalhar os pontos
-    const jitter = ((idx * 2654435761) % 1000) / 1000 * 0.7 - 0.35
-    return {
-      id: i.id,
-      status,
-      statusIdx: statusIdx + jitter,
-      age: Math.round((refDate.getTime() - i.entryDate.getTime()) / (1000 * 60 * 60 * 24)),
-    }
+    const jitter = ((idx * 2654435761) % 1000) / 1000 * 0.6 - 0.3
+    const age = Math.round((refDate.getTime() - i.entryDate.getTime()) / (1000 * 60 * 60 * 24))
+    return { id: i.id, status, statusIdx: statusIdx + jitter, age, _statusIdx: statusIdx }
   }), [items, statuses])
 
-  const ages = data.map(d => d.age).sort((a, b) => a - b)
+  const ages = dataWithAge.map(d => d.age).sort((a, b) => a - b)
   const p85 = getPercentile(ages, 85)
   const p95 = getPercentile(ages, 95)
+
+  // Separa pontos em 3 zonas de risco para colorir diferente
+  const dataNormal = dataWithAge.filter(d => d.age <= p85)
+  const dataWarning = dataWithAge.filter(d => d.age > p85 && d.age <= p95)
+  const dataCritical = dataWithAge.filter(d => d.age > p95)
+
+  // Top 10 mais envelhecidos
+  const top10 = useMemo(() =>
+    [...dataWithAge].sort((a, b) => b.age - a.age).slice(0, 10)
+  , [dataWithAge])
 
   const explanation =
     'Mostra os itens que ainda estão em andamento (sem data de conclusão) e há quantos dias cada um está no fluxo, calculado sempre a partir de hoje. ' +
     'O eixo X mostra o status atual; o eixo Y mostra a idade em dias. ' +
-    'Cada ponto é um item WIP — pontos acima da linha P85 estão envelhecendo mais do que 85% dos itens já entregues e são candidatos prioritários para desbloqueio. ' +
-    'Pontos acima do P95 representam anomalias graves e devem ser tratados com urgência. ' +
+    'Pontos <strong>azuis</strong> estão dentro do normal; <strong>laranja</strong> ultrapassaram o P85 e merecem atenção; <strong>vermelho</strong> ultrapassaram o P95 e são urgentes. ' +
     'Colunas com muitos pontos altos indicam gargalos naquele status.'
 
+  const tooltipContent = ({ payload }: { payload?: Array<{ payload: { id: string; status: string; age: number } }> }) => {
+    if (!payload?.length) return null
+    const d = payload[0].payload
+    const zone = d.age > p95 ? '🔴 Crítico' : d.age > p85 ? '🟠 Atenção' : '🟢 Normal'
+    return (
+      <div className="bg-white border border-[#F2C5BB] px-3 py-2 rounded shadow text-xs">
+        <div className="font-bold text-[#092140] mb-1">{zone}</div>
+        <div>ID: {d.id}</div>
+        <div>Status: {d.status}</div>
+        <div>Idade: {d.age} dias</div>
+      </div>
+    )
+  }
+
   return (
-    <Card title="Aging Chart" desc="Tempo em andamento dos itens WIP (X = status, Y = dias)." explanation={explanation}>
-      {data.length === 0 ? <Empty msg="Nenhum item em andamento." /> : (
-        <ResponsiveContainer width="100%" height={300}>
-          <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 40 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={C.blush} />
-            <XAxis
-              dataKey="statusIdx"
-              type="number"
-              domain={[-0.5, statuses.length - 0.5]}
-              ticks={statuses.map((_, i) => i)}
-              tickFormatter={(v: number) => statuses[Math.round(v)] ?? ''}
-              tick={{ fontSize: 10, fill: C.navy }}
-              angle={-30}
-              textAnchor="end"
-              interval={0}
-            />
-            <YAxis
-              dataKey="age"
-              type="number"
-              tick={{ fontSize: 11, fill: C.salmon }}
-              unit="d"
-            />
-            <Tooltip content={({ payload }) => {
-              if (!payload?.length) return null
-              const d = payload[0].payload
-              return (
-                <div className="bg-white border border-[#F2C5BB] px-3 py-2 rounded shadow text-xs">
-                  <div>ID: {d.id}</div><div>Status: {d.status}</div><div>Idade: {d.age}d</div>
-                </div>
-              )
-            }} />
-            <ReferenceLine y={p85} stroke={C.salmon} strokeDasharray="4 2" label={{ value: `P85: ${p85}d`, position: 'insideTopRight', fill: C.salmon, fontSize: 10 }} />
-            <ReferenceLine y={p95} stroke={C.terra} strokeDasharray="4 2" label={{ value: `P95: ${p95}d`, position: 'insideTopRight', fill: C.terra, fontSize: 10 }} />
-            <Scatter data={data} fill={C.navy} fillOpacity={0.5} r={3} />
-          </ScatterChart>
-        </ResponsiveContainer>
+    <Card title="Aging Chart" desc="Tempo em andamento dos itens WIP. Cores indicam zona de risco." explanation={explanation}>
+      {dataWithAge.length === 0 ? <Empty msg="Nenhum item em andamento." /> : (
+        <>
+          {/* Legenda de zonas */}
+          <div className="flex gap-4 mb-3 flex-wrap">
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#10B981] inline-block" /><span className="text-xs text-[#555]">Normal (≤ P85)</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] inline-block" /><span className="text-xs text-[#555]">Atenção (P85–P95)</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] inline-block" /><span className="text-xs text-[#555]">Crítico (&gt; P95)</span></div>
+            <div className="ml-auto flex items-center gap-3">
+              <span className="text-xs font-semibold" style={{ color: C.salmon }}>P85: {p85}d</span>
+              <span className="text-xs font-semibold" style={{ color: C.terra }}>P95: {p95}d</span>
+            </div>
+          </div>
+
+          <div className="flex">
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart margin={{ top: 10, right: 8, bottom: 60, left: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={C.blush} />
+                <XAxis
+                  dataKey="statusIdx"
+                  type="number"
+                  domain={[-0.5, statuses.length - 0.5]}
+                  ticks={statuses.map((_, i) => i)}
+                  tickFormatter={(v: number) => statuses[Math.round(v)] ?? ''}
+                  tick={{ fontSize: 10, fill: C.navy }}
+                  angle={-30}
+                  textAnchor="end"
+                  interval={0}
+                />
+                <YAxis dataKey="age" type="number" tick={{ fontSize: 11, fill: C.salmon }} unit="d" />
+                <Tooltip content={tooltipContent} />
+                <ReferenceLine y={p85} stroke={C.salmon} strokeDasharray="4 2" />
+                <ReferenceLine y={p95} stroke={C.terra} strokeDasharray="4 2" />
+                {/* Pontos normais */}
+                <Scatter data={dataNormal} fill="#10B981" fillOpacity={0.55} r={3} />
+                {/* Pontos de atenção */}
+                <Scatter data={dataWarning} fill="#F59E0B" fillOpacity={0.75} r={4} />
+                {/* Pontos críticos */}
+                <Scatter data={dataCritical} fill="#EF4444" fillOpacity={0.9} r={5} />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Top 10 mais envelhecidos */}
+          {top10.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-bold text-[#092140] mb-2">🔝 Top 10 itens mais envelhecidos</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-[#F9F4F2]">
+                      <th className="text-left px-3 py-1.5 text-[#092140] font-semibold border-b border-[#F2C5BB]">#</th>
+                      <th className="text-left px-3 py-1.5 text-[#092140] font-semibold border-b border-[#F2C5BB]">ID</th>
+                      <th className="text-left px-3 py-1.5 text-[#092140] font-semibold border-b border-[#F2C5BB]">Status</th>
+                      <th className="text-right px-3 py-1.5 text-[#092140] font-semibold border-b border-[#F2C5BB]">Idade</th>
+                      <th className="text-center px-3 py-1.5 text-[#092140] font-semibold border-b border-[#F2C5BB]">Zona</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {top10.map((item, i) => {
+                      const isCritical = item.age > p95
+                      const isWarning = item.age > p85 && !isCritical
+                      return (
+                        <tr key={item.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}>
+                          <td className="px-3 py-1.5 text-[#888]">{i + 1}</td>
+                          <td className="px-3 py-1.5 font-mono font-semibold text-[#092140]">{item.id}</td>
+                          <td className="px-3 py-1.5 text-[#555]">{item.status}</td>
+                          <td className="px-3 py-1.5 text-right font-bold" style={{ color: isCritical ? '#EF4444' : isWarning ? '#F59E0B' : '#10B981' }}>{item.age}d</td>
+                          <td className="px-3 py-1.5 text-center">{isCritical ? '🔴' : isWarning ? '🟠' : '🟢'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </Card>
   )
