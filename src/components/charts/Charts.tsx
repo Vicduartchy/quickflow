@@ -35,17 +35,20 @@ export default function Charts({ items, groupBy, excludeZeroCT }: Props) {
 
 // ─── Card com explicação colapsável ──────────────────────────────────────────
 
+import { IconSearch } from './Icons'
+
 function Card({
-  title, desc, explanation, children,
+  title, desc, explanation, insight, children,
 }: {
   title: string
   desc: string
   explanation: string
+  insight: string
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-white rounded-xl border border-[#F2C5BB] shadow-sm p-5 print:break-inside-avoid">
+    <div className="bg-white rounded-xl border border-[#F2C5BB] shadow-sm p-5 print:break-inside-avoid flex flex-col">
       <div className="flex items-start justify-between mb-1">
         <h3 className="font-bold text-[#092140]">{title}</h3>
         <button
@@ -64,7 +67,15 @@ function Card({
         </div>
       )}
       {!open && <div className="mb-2" />}
-      {children}
+      <div className="flex-1">
+        {children}
+      </div>
+      <div className="mt-4 pt-3 border-t border-gray-100">
+        <p className="text-xs text-[#555] leading-relaxed flex items-start gap-1.5">
+          <IconSearch size={13} className="text-[#BF452A] shrink-0 mt-0.5" />
+          <span><strong className="text-[#092140]">Insight Kanban:</strong> {insight}</span>
+        </p>
+      </div>
     </div>
   )
 }
@@ -88,8 +99,10 @@ function ScatterplotChart({ items }: { items: WorkItem[]; groupBy: GroupBy }) {
     'As linhas tracejadas são os percentis: P50 significa que metade dos itens foi entregue em até esse tempo; P85 e P95 mostram os limites para 85% e 95% dos itens, respectivamente. ' +
     'Use o P85 como referência para dar previsões de prazo com alta confiança — ao prometer uma entrega, diga que ela ocorrerá em até P85 dias.'
 
+  const insight = 'No Kanban, o foco não é a média, mas a previsibilidade. O P85 é o seu SLA (Acordo de Nível de Serviço). Use-o para prometer prazos com 85% de confiança. Pontos muito acima do P85 formam a "cauda longa", indicando variabilidade que deve ser mitigada com limites de WIP e remoção de bloqueios.'
+
   return (
-    <Card title="Cycle Time Scatterplot" desc="Distribuição do Cycle Time por item concluído." explanation={explanation}>
+    <Card title="Cycle Time Scatterplot" desc="Distribuição do Cycle Time por item concluído." explanation={explanation} insight={insight}>
       {items.length === 0 ? <Empty /> : (
         <>
           <div className="flex gap-4 mb-3 flex-wrap">
@@ -163,8 +176,10 @@ function ThroughputRunChart({ items, groupBy }: { items: WorkItem[]; groupBy: Gr
     'Observe a consistência: um time saudável tende a ter barras com alturas parecidas ao longo do tempo. ' +
     'Variações bruscas merecem investigação — tanto picos (possível entrega em lote) quanto quedas (possível bloqueio ou sobrecarga).'
 
+  const insight = 'Mede a "taxa de saída" (Departure Rate) do sistema. O objetivo não é maximizar a entrega em um único período, mas buscar uma cadência sustentável e previsível. Variações altas indicam entregas em lote (batching), o que sobrecarrega etapas downstream. Busque fluxo contínuo.'
+
   return (
-    <Card title="Throughput Run Chart" desc={`Itens concluídos por ${label}.`} explanation={explanation}>
+    <Card title="Throughput Run Chart" desc={`Itens concluídos por ${label}.`} explanation={explanation} insight={insight}>
       {data.length === 0 ? <Empty /> : (
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={data} margin={{ top: showLabels ? 20 : 10, right: 20, bottom: 20, left: 0 }}>
@@ -246,8 +261,10 @@ function AgingChart({ items }: { items: WorkItem[] }) {
     )
   }
 
+  const insight = 'O envelhecimento do WIP (WIP Aging) é a métrica antecedente mais importante do Kanban. Itens na zona laranja ou vermelha estão prestes a estourar o SLA (P85). Discuta-os diariamente na Kanban Meeting: "O que precisamos fazer para mover este item hoje?"'
+
   return (
-    <Card title="Aging Chart" desc="Tempo em andamento dos itens WIP. Cores indicam zona de risco." explanation={explanation}>
+    <Card title="Aging Chart" desc="Tempo em andamento dos itens WIP. Cores indicam zona de risco." explanation={explanation} insight={insight}>
       {dataWithAge.length === 0 ? <Empty msg="Nenhum item em andamento." /> : (
         <>
           {/* Legenda de zonas */}
@@ -354,8 +371,10 @@ function HistogramChart({ items }: { items: WorkItem[] }) {
     'Uma distribuição espalhada ou com cauda longa à direita indica alta variabilidade — o time entrega itens com tempos muito diferentes, o que dificulta previsões. ' +
     'Barras isoladas à direita podem ser itens problemáticos que merecem análise individual.'
 
+  const insight = 'A forma da distribuição revela a saúde do fluxo. Um sistema previsível tem uma curva estreita (baixa variabilidade). Uma curva achatada com cauda longa à direita indica que o sistema é governado por exceções e bloqueios, não por políticas explícitas de fluxo.'
+
   return (
-    <Card title="Histograma Cycle Time" desc="Frequência de cada faixa de Cycle Time." explanation={explanation}>
+    <Card title="Histograma Cycle Time" desc="Frequência de cada faixa de Cycle Time." explanation={explanation} insight={insight}>
       {data.length === 0 ? <Empty /> : (
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={data} margin={{ top: showLabels ? 20 : 10, right: 20, bottom: 20, left: 0 }}>
@@ -401,8 +420,10 @@ function CFDChart({ items, groupBy }: { items: WorkItem[]; groupBy: GroupBy }) {
     'Se uma camada (especialmente WIP ou status intermediários) crescer muito mais do que as outras, há acúmulo — sinal de gargalo. ' +
     'Se a camada "Concluído" parar de crescer enquanto as demais aumentam, o fluxo está represado.'
 
+  const insight = 'O CFD é o raio-X do fluxo. Faixas que se alargam indicam acúmulo de WIP (gargalos). Faixas que se estreitam indicam inanição (starvation). Pela Lei de Little, manter a distância vertical (WIP) constante é essencial para manter a distância horizontal (Cycle Time) previsível.'
+
   return (
-    <Card title="Cumulative Flow Diagram" desc="Evolução dos itens em cada status ao longo do tempo." explanation={explanation}>
+    <Card title="Cumulative Flow Diagram" desc="Evolução dos itens em cada status ao longo do tempo." explanation={explanation} insight={insight}>
       {data.length === 0 ? <Empty /> : (
         <ResponsiveContainer width="100%" height={260}>
           <AreaChart data={data} margin={{ top: 10, right: 20, bottom: 20, left: 0 }}>
@@ -449,11 +470,14 @@ function BreakdownChart({ items }: { items: WorkItem[] }) {
     'Idealmente, a maior fatia deve ser o status final (Concluído/Done). ' +
     'Se os status intermediários concentrarem a maior parte dos itens, o time está acumulando trabalho em progresso — o que aumenta o Cycle Time.'
 
+  const insight = 'Identifica onde o trabalho está acumulado agora. Na Teoria das Restrições, o fluxo é limitado pelo gargalo. Se um status concentra grande parte do WIP, aplique um limite de WIP rigoroso nele para forçar a colaboração do time (Swarming) e resolver a restrição.'
+
   return (
     <Card
       title="Stage Breakdown"
       desc="Distribuição de itens por status (todos os estados)."
       explanation={explanation}
+      insight={insight}
     >
       <div className="flex gap-2 mb-4">
         {(['bar', 'pie'] as BreakdownMode[]).map(m => (

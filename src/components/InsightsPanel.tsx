@@ -36,14 +36,14 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
   if (spreadRatio > 2.5) {
     insights.push({
       type: 'warning',
-      title: 'Alta variabilidade no Cycle Time',
-      body: `O P95 (${p95}d) é mais de ${spreadRatio.toFixed(1)}× maior que o P85 (${p85}d). Isso indica que uma parcela dos itens demora muito mais do que o padrão do time — possivelmente por escopo mal definido, dependências externas ou bloqueios recorrentes. Recomenda-se investigar os itens acima do P85 para identificar padrões.`,
+      title: 'Alta variabilidade no Cycle Time (Cauda Longa)',
+      body: `O P95 (${p95}d) é ${spreadRatio.toFixed(1)}× maior que o P85 (${p85}d). No Método Kanban, essa "cauda longa" indica imprevisibilidade sistêmica — causada por dependências não gerenciadas, bloqueios invisíveis ou ausência de políticas explícitas de priorização (Classes de Serviço). Investigue os itens da cauda para criar políticas de mitigação.`,
     })
   } else if (spreadRatio > 0 && spreadRatio <= 1.5) {
     insights.push({
       type: 'success',
-      title: 'Cycle Time previsível',
-      body: `A diferença entre P85 (${p85}d) e P95 (${p95}d) é pequena, o que indica um fluxo consistente. O time consegue entregar a maioria dos itens em um intervalo de tempo estável — boa base para previsões de prazo confiáveis.`,
+      title: 'Previsibilidade de Serviço (SLA)',
+      body: `A diferença entre P85 (${p85}d) e P95 (${p95}d) é pequena, indicando maturidade no fluxo. O sistema está sob controle e a variabilidade é gerenciada, permitindo que o time estabeleça Acordos de Nível de Serviço (SLAs) altamente confiáveis para os clientes.`,
     })
   }
 
@@ -52,13 +52,13 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
     insights.push({
       type: 'warning',
       title: 'Cycle Time mediano elevado',
-      body: `Metade dos itens leva mais de ${p50} dias para ser entregue. Cycle Times altos geralmente indicam excesso de WIP, itens muito grandes ou etapas de espera longas no fluxo. Considere limitar o WIP e dividir itens grandes em entregas menores.`,
+      body: `Metade dos itens leva mais de ${p50} dias. Pela Lei de Little, Cycle Time alto é sintoma direto de excesso de trabalho em progresso (WIP) ou filas de espera ociosas. Estabeleça limites de WIP (WIP Limits) no sistema puxado para forçar a conclusão antes de aceitar novas demandas.`,
     })
   } else if (p50 <= 7) {
     insights.push({
       type: 'success',
-      title: 'Cycle Time mediano saudável',
-      body: `Com P50 de ${p50} dias, o time entrega metade dos itens em menos de uma semana. Isso é um sinal de fluxo ágil e itens bem dimensionados.`,
+      title: 'Liquidez do Fluxo',
+      body: `Com P50 de ${p50} dias, o sistema apresenta alta liquidez. O fluxo contínuo (Flow) está sendo mantido, o que reduz o custo de atraso (Cost of Delay) e acelera o ciclo de feedback (Lead Time) com o cliente.`,
     })
   }
 
@@ -82,14 +82,14 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
     if (tpVariability > 0.6) {
       insights.push({
         type: 'warning',
-        title: 'Throughput instável',
-        body: `A variação entre os períodos de maior e menor entrega é alta (IQR de ${iqr} itens sobre uma mediana de ${tpMedian}). Throughput instável dificulta planejamento e pode indicar entregas em lote, sprints mal calibrados ou dependências entre itens. Buscar um fluxo mais contínuo tende a reduzir essa variação.`,
+        title: 'Throughput instável (Entregas em Lote)',
+        body: `A variação de entregas é alta (IQR de ${iqr} sobre mediana de ${tpMedian}). Isso sugere que o sistema não está fluindo continuamente, mas operando em lotes (batching) ou sofrendo de inanição (starvation). No Kanban, busque equilibrar a demanda com a capacidade para suavizar a taxa de entrega.`,
       })
     } else if (tpVariability <= 0.3) {
       insights.push({
         type: 'success',
-        title: 'Throughput consistente',
-        body: `O volume de entregas por período é estável, com baixa variação em torno da mediana de ${tpMedian} itens. Isso facilita previsões de capacidade e planejamento de roadmap.`,
+        title: 'Cadência de Entrega Sustentável',
+        body: `O volume de entregas é estável (mediana de ${tpMedian} itens). O sistema alcançou um ritmo sustentável, equilibrando a taxa de entrada (Arrival Rate) com a taxa de saída (Departure Rate), fundamental para o planejamento previsível de capacidade.`,
       })
     }
   }
@@ -100,8 +100,8 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
   if (wipRatio > 0.5) {
     insights.push({
       type: 'warning',
-      title: 'Work in Progress (WIP) elevado em relação ao total',
-      body: `${wip.length} de ${items.length} itens (${(wipRatio * 100).toFixed(0)}%) ainda estão em andamento. Um Work in Progress (WIP) alto aumenta o Cycle Time e reduz o foco do time. Pela Lei de Little, reduzir o WIP é a forma mais direta de acelerar as entregas sem aumentar a equipe.`,
+      title: 'Sobrecarga do Sistema (WIP Elevado)',
+      body: `${wip.length} itens (${(wipRatio * 100).toFixed(0)}%) estão em andamento. No Kanban, "pare de começar e comece a terminar". WIP excessivo dilui a capacidade, causa trocas de contexto (context switching) e mascara gargalos. Implemente limites de WIP para proteger a equipe da sobrecarga (Muri).`,
     })
   }
 
@@ -115,8 +115,8 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
     if (oldWip.length > 0) {
       insights.push({
         type: 'warning',
-        title: `${oldWip.length} ${oldWip.length === 1 ? 'item' : 'itens'} em andamento além do P95`,
-        body: `${oldWip.length === 1 ? 'Um item está' : `${oldWip.length} itens estão`} em andamento há mais de ${p95} dias — acima do P95 de Cycle Time dos itens já entregues. Esses itens provavelmente estão bloqueados ou foram esquecidos no fluxo. Recomenda-se revisão imediata em reunião de gestão de fluxo.`,
+        title: `${oldWip.length} ${oldWip.length === 1 ? 'item' : 'itens'} com envelhecimento crítico`,
+        body: `${oldWip.length === 1 ? 'Um item está' : `${oldWip.length} itens estão`} no fluxo há mais de ${p95} dias (acima do P95). No Kanban, o envelhecimento do WIP (WIP Aging) é o principal indicador de risco de atraso. Discuta esses itens imediatamente na reunião de fluxo (Kanban Meeting) para "desbloquear" o valor represado.`,
       })
     }
   }
@@ -127,8 +127,8 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
   if (zeroPct > 15) {
     insights.push({
       type: 'info',
-      title: `${zeroPct.toFixed(0)}% dos itens têm Cycle Time zero`,
-      body: `${zeroCT.length} itens foram concluídos no mesmo dia em que foram criados. Isso pode indicar migrações de dados, itens criados retroativamente ou tarefas muito pequenas. Ative o filtro "Excluir Cycle Time = 0" para analisar o fluxo real sem esses itens.`,
+      title: `${zeroPct.toFixed(0)}% dos itens com Cycle Time zero (Trabalho Oculto)`,
+      body: `${zeroCT.length} itens foram concluídos no mesmo dia. Isso frequentemente indica "trabalho invisível" sendo registrado apenas após a conclusão, burlando o sistema puxado. Torne o trabalho visível desde o início para refletir a verdadeira carga da equipe.`,
     })
   }
 
@@ -145,8 +145,8 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
     if (topPct > 40 && wip.length > 5) {
       insights.push({
         type: 'warning',
-        title: `Possível gargalo em "${topStatus}"`,
-        body: `${topCount} dos ${wip.length} itens em andamento (${topPct.toFixed(0)}%) estão concentrados no status "${topStatus}". Uma concentração tão alta em um único estágio é um sinal claro de gargalo. Verifique se há limite de WIP definido para essa etapa e se o time tem capacidade para processar os itens acumulados.`,
+        title: `Gargalo Sistêmico em "${topStatus}"`,
+        body: `${topCount} itens (${topPct.toFixed(0)}%) estão acumulados em "${topStatus}". Na Teoria das Restrições, o fluxo do sistema é ditado pelo seu gargalo. Subordine o sistema à capacidade dessa etapa e aplique um limite de WIP rigoroso para expor o problema e forçar a colaboração (Swarming) para resolvê-lo.`,
       })
     }
   }
