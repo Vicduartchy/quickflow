@@ -59,13 +59,39 @@ export default function UploadScreen() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-56px)] px-4">
-      <div className="w-full max-w-lg">
-        <div className="mb-6">
-          <img src="/quickflow/logo-dark.png" alt="Vic Duarte" className="h-12 object-contain" />
+    <div className="flex items-center justify-center min-h-[calc(100vh-56px)] px-4 py-10">
+      <div className="w-full max-w-2xl">
+
+        {/* Hero */}
+        <div className="mb-8 text-center">
+          <img src="/quickflow/logo-dark.png" alt="Vic Duarte" className="h-12 object-contain mx-auto mb-5" />
+          <h1 className="text-4xl font-bold text-[#092140] mb-3">QuickFlow</h1>
+          <p className="text-lg text-[#BF452A] font-medium mb-4">Métricas de fluxo ágil, sem complicação.</p>
+          <p className="text-[#555] text-sm leading-relaxed max-w-xl mx-auto">
+            O <strong>QuickFlow</strong> transforma sua planilha do Azure DevOps, Jira ou Trello em um dashboard completo de gestão de fluxo —
+            com <strong>Cycle Time</strong>, <strong>Throughput</strong>, <strong>Aging WIP</strong> e muito mais.
+            Tudo direto no seu navegador, sem cadastro, sem servidor, sem custo.
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-[#092140] mb-2">{t.upload.title}</h1>
-        <p className="text-[#D99789] mb-8">{t.upload.subtitle}</p>
+
+        {/* Cards de benefício */}
+        <div className="grid grid-cols-3 gap-3 mb-8 text-center">
+          {[
+            { icon: '📊', title: 'Cycle Time & Throughput', desc: 'Percentis P50, P85, P95 e mediana de entregas por período.' },
+            { icon: '🔍', title: 'Aging WIP', desc: 'Veja quais itens estão envelhecendo além do limite saudável.' },
+            { icon: '🔒', title: '100% Privado', desc: 'Seus dados nunca saem do seu navegador.' },
+          ].map(({ icon, title, desc }) => (
+            <div key={title} className="bg-white border border-[#F2C5BB] rounded-xl p-4 shadow-sm">
+              <div className="text-2xl mb-2">{icon}</div>
+              <div className="text-xs font-bold text-[#092140] mb-1">{title}</div>
+              <div className="text-xs text-[#888] leading-snug">{desc}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Upload */}
+        <h2 className="text-base font-semibold text-[#092140] mb-3">{t.upload.title}</h2>
+        <p className="text-[#D99789] text-sm mb-4">{t.upload.subtitle}</p>
         <div
           onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
           onDragLeave={() => setDragging(false)}
@@ -91,17 +117,22 @@ export default function UploadScreen() {
           </span>
         </div>
 
-        {/* Link para a criadora */}
-        <div className="mt-6 text-center">
+        {/* CTA da criadora */}
+        <div className="mt-8 bg-[#092140] rounded-2xl px-6 py-5 flex flex-col sm:flex-row items-center gap-4">
+          <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-10 object-contain shrink-0" />
+          <div className="flex-1 text-center sm:text-left">
+            <p className="text-white text-sm font-semibold mb-0.5">Criado por Vic Duarte</p>
+            <p className="text-[#D99789] text-xs leading-snug">
+              Especialista em gestão estratégica e aprendizagem. Ajuda times e organizações a usarem dados de fluxo para tomar decisões melhores e entregar mais valor.
+            </p>
+          </div>
           <a
             href="https://vicduarte.site/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-[#BF452A] hover:text-[#092140] transition-colors group"
+            className="shrink-0 px-4 py-2 bg-[#BF452A] hover:bg-[#a33a22] text-white text-xs font-bold rounded-full transition-colors whitespace-nowrap"
           >
-            <img src="/quickflow/logo-dark.png" alt="Vic Duarte" className="h-5 object-contain" />
-            <span className="underline underline-offset-2 group-hover:no-underline">Conheça a criadora deste sistema</span>
-            <span className="text-[#D99789]">↗</span>
+            Conheça o trabalho ↗
           </a>
         </div>
       </div>
