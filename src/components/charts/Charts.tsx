@@ -35,7 +35,7 @@ export default function Charts({ items, groupBy, excludeZeroCT }: Props) {
 
 // ─── Card com explicação colapsável ──────────────────────────────────────────
 
-import { IconSearch } from './Icons'
+import { IconSearch } from '../Icons'
 
 function Card({
   title, desc, explanation, insight, children,
