@@ -5,7 +5,7 @@ import {
   AreaChart, Area, Legend, PieChart, Pie, Cell,
 } from 'recharts'
 import type { WorkItem, GroupBy } from '../../types'
-import { getPercentile, getGroupKey, getGroupLabel, getDatasetMaxDate } from '../../lib/mapping'
+import { getPercentile, getGroupKey, getGroupLabel } from '../../lib/mapping'
 
 interface Props { items: WorkItem[]; groupBy: GroupBy; excludeZeroCT?: boolean }
 
@@ -24,7 +24,7 @@ export default function Charts({ items, groupBy, excludeZeroCT }: Props) {
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <ScatterplotChart items={concludedFiltered} groupBy={groupBy} />
       <ThroughputRunChart items={concludedFiltered} groupBy={groupBy} />
-      <AgingChart items={wip} allItems={items} />
+      <AgingChart items={wip} />
       <HistogramChart items={concludedFiltered} />
       <CFDChart items={items} groupBy={groupBy} />
       <BreakdownChart items={items} />
@@ -173,8 +173,9 @@ function ThroughputRunChart({ items, groupBy }: { items: WorkItem[]; groupBy: Gr
 
 // ─── Aging Chart ──────────────────────────────────────────────────────────────
 
-function AgingChart({ items, allItems }: { items: WorkItem[]; allItems: WorkItem[] }) {
-  const refDate = getDatasetMaxDate(allItems)
+function AgingChart({ items }: { items: WorkItem[] }) {
+  // Sempre usa a data de hoje como referência — itens sem Closed Date estão em andamento agora
+  const refDate = new Date()
   const data = items.map(i => ({
     id: i.id,
     status: i.currentStatus ?? 'Unknown',
@@ -185,7 +186,7 @@ function AgingChart({ items, allItems }: { items: WorkItem[]; allItems: WorkItem
   const p95 = getPercentile(ages, 95)
 
   const explanation =
-    'Mostra os itens que ainda estão em andamento (WIP) e há quantos dias cada um está no fluxo. ' +
+    'Mostra os itens que ainda estão em andamento (sem data de conclusão) e há quantos dias cada um está no fluxo, calculado sempre a partir de hoje. ' +
     'O eixo horizontal é a idade do item em dias; o eixo vertical é o status atual. ' +
     'Pontos além da linha P85 estão envelhecendo mais do que 85% dos itens já entregues — são candidatos prioritários para desbloqueio. ' +
     'Pontos além do P95 representam anomalias graves e devem ser tratados com urgência. ' +
