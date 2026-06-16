@@ -115,7 +115,7 @@ function ScatterplotChart({ items }: { items: WorkItem[]; groupBy: GroupBy }) {
                   const d = payload[0].payload
                   return (
                     <div className="bg-white border border-[#F2C5BB] px-3 py-2 rounded shadow text-xs">
-                      <div>ID: {d.id}</div><div>CT: {d.y}d</div><div>{new Date(d.x).toLocaleDateString('pt-BR')}</div>
+                      <div>ID: {d.id}</div><div>Cycle Time: {d.y}d</div><div>{new Date(d.x).toLocaleDateString('pt-BR')}</div>
                     </div>
                   )
                 }} />
@@ -287,7 +287,7 @@ function HistogramChart({ items }: { items: WorkItem[] }) {
     'Barras isoladas à direita podem ser itens problemáticos que merecem análise individual.'
 
   return (
-    <Card title="Histograma CT" desc="Frequência de cada faixa de Cycle Time." explanation={explanation}>
+    <Card title="Histograma Cycle Time" desc="Frequência de cada faixa de Cycle Time." explanation={explanation}>
       {data.length === 0 ? <Empty /> : (
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={data} margin={{ top: showLabels ? 20 : 10, right: 20, bottom: 20, left: 0 }}>

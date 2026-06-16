@@ -99,8 +99,8 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
   if (wipRatio > 0.5) {
     insights.push({
       type: 'warning',
-      title: 'WIP elevado em relação ao total',
-      body: `${wip.length} de ${items.length} itens (${(wipRatio * 100).toFixed(0)}%) ainda estão em andamento. Um WIP alto aumenta o Cycle Time e reduz o foco do time. Pela Lei de Little, reduzir o WIP é a forma mais direta de acelerar as entregas sem aumentar a equipe.`,
+      title: 'Work in Progress (WIP) elevado em relação ao total',
+      body: `${wip.length} de ${items.length} itens (${(wipRatio * 100).toFixed(0)}%) ainda estão em andamento. Um Work in Progress (WIP) alto aumenta o Cycle Time e reduz o foco do time. Pela Lei de Little, reduzir o WIP é a forma mais direta de acelerar as entregas sem aumentar a equipe.`,
     })
   }
 
@@ -127,7 +127,7 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
     insights.push({
       type: 'info',
       title: `${zeroPct.toFixed(0)}% dos itens têm Cycle Time zero`,
-      body: `${zeroCT.length} itens foram concluídos no mesmo dia em que foram criados. Isso pode indicar migrações de dados, itens criados retroativamente ou tarefas muito pequenas. Ative o filtro "Excluir CT = 0" para analisar o fluxo real sem esses itens.`,
+      body: `${zeroCT.length} itens foram concluídos no mesmo dia em que foram criados. Isso pode indicar migrações de dados, itens criados retroativamente ou tarefas muito pequenas. Ative o filtro "Excluir Cycle Time = 0" para analisar o fluxo real sem esses itens.`,
     })
   }
 

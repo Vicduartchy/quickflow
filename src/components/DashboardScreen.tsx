@@ -80,7 +80,7 @@ export default function DashboardScreen() {
         <div className="mb-5">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={excludeZeroCT} onChange={e => setExcludeZeroCT(e.target.checked)} className="accent-[#BF452A]" />
-            <span className="text-xs font-semibold text-[#D99789] uppercase tracking-wide">Excluir CT = 0</span>
+            <span className="text-xs font-semibold text-[#D99789] uppercase tracking-wide">Excluir Cycle Time = 0</span>
           </label>
           <p className="text-xs text-gray-400 mt-1">Remove itens concluídos no mesmo dia (ex: migrações)</p>
         </div>
