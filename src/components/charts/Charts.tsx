@@ -21,7 +21,7 @@ export default function Charts({ items, groupBy, excludeZeroCT }: Props) {
   const concludedFiltered = excludeZeroCT ? concluded.filter(i => i.cycleTime! > 0) : concluded
   const wip = items.filter(i => i.cycleTime === undefined)
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 print:grid-cols-1">
       <ScatterplotChart items={concludedFiltered} groupBy={groupBy} />
       <ThroughputRunChart items={concludedFiltered} groupBy={groupBy} />
       <AgingChart items={wip} />
@@ -44,7 +44,7 @@ function Card({
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-white rounded-xl border border-[#F2C5BB] shadow-sm p-5">
+    <div className="bg-white rounded-xl border border-[#F2C5BB] shadow-sm p-5 print:break-inside-avoid">
       <div className="flex items-start justify-between mb-1">
         <h3 className="font-bold text-[#092140]">{title}</h3>
         <button
@@ -393,7 +393,7 @@ function BreakdownChart({ items }: { items: WorkItem[] }) {
 
       {data.length === 0 ? <Empty /> : mode === 'bar' ? (
         <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data} layout="vertical" margin={{ top: 5, right: 60, bottom: 5, left: 100 }}>
+          <BarChart data={data} layout="vertical" margin={{ top: 5, right: 80, bottom: 5, left: 100 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={C.blush} />
             <XAxis type="number" tick={{ fontSize: 11, fill: C.salmon }} />
             <YAxis type="category" dataKey="status" tick={{ fontSize: 11, fill: C.navy }} width={95} />

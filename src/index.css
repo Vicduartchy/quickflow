@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+@media print {
+  /* Oculta elementos interativos e sidebar */
+  nav,
+  aside,
+  button,
+  input[type="checkbox"],
+  input[type="date"] {
+    display: none !important;
+  }
+
+  /* Remove min-height e overflow do wrapper principal */
+  body, #root {
+    min-height: unset !important;
+    background: white !important;
+  }
+
+  /* Conteúdo principal ocupa 100% sem a sidebar */
+  main {
+    margin-left: 0 !important;
+    padding: 16px !important;
+    width: 100% !important;
+  }
+
+  /* Força coluna única nos grids de gráficos */
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Evita corte de cards no meio da página */
+  .bg-white.rounded-xl {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Garante que os gráficos Recharts tenham altura fixa na impressão */
+  .recharts-responsive-container {
+    height: 280px !important;
+  }
+
+  /* Insights panel — evita corte */
+  .mb-6 {
+    break-inside: avoid !important;
+  }
+
+  /* Margem entre páginas */
+  @page {
+    margin: 16mm;
+  }
+}

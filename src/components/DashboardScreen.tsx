@@ -53,7 +53,7 @@ export default function DashboardScreen() {
 
   return (
     <div className="flex min-h-[calc(100vh-56px)]">
-      <aside className="w-64 shrink-0 bg-white border-r border-[#F2C5BB] p-5 overflow-y-auto">
+      <aside className="w-64 shrink-0 bg-white border-r border-[#F2C5BB] p-5 overflow-y-auto print:hidden">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-[#092140]">{t.dashboard.filters}</h2>
           <button onClick={resetAll} className="text-xs text-[#BF452A] hover:underline">{t.dashboard.reset}</button>
@@ -127,7 +127,7 @@ export default function DashboardScreen() {
           </div>
         )}
       </aside>
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 p-6 overflow-y-auto print:w-full print:p-0">
         {hasNoConcluded && (
           <div className="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
             <span>⚠️</span><span>{t.dashboard.wipOnly}</span>
