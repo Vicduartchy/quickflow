@@ -229,7 +229,9 @@ function AgingChart({ items }: { items: WorkItem[] }) {
     'Pontos <strong>azuis</strong> estão dentro do normal; <strong>laranja</strong> ultrapassaram o P85 e merecem atenção; <strong>vermelho</strong> ultrapassaram o P95 e são urgentes. ' +
     'Colunas com muitos pontos altos indicam gargalos naquele status.'
 
-  const tooltipContent = ({ payload }: { payload?: Array<{ payload: { id: string; status: string; age: number } }> }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tooltipContent = (props: any) => {
+    const payload = props?.payload
     if (!payload?.length) return null
     const d = payload[0].payload
     const zone = d.age > p95 ? 'Crítico' : d.age > p85 ? 'Atenção' : 'Normal'

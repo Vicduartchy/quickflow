@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
 import { useApp } from '../lib/context'
 import { autoMapColumns, buildWorkItems } from '../lib/mapping'
+import { IconBarChart, IconClock, IconLock, IconWarning, IconExternalLink } from './Icons'
 
 export default function UploadScreen() {
   const { t, setStep, setRawRows, setHeaders, setWorkItems, setMapping } = useApp()
