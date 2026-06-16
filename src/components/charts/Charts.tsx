@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import type { WorkItem, GroupBy } from '../../types'
 import { getPercentile, getGroupKey, getGroupLabel } from '../../lib/mapping'
+import { IconTrophy, IconCircleDot } from '../Icons'
 
 interface Props { items: WorkItem[]; groupBy: GroupBy; excludeZeroCT?: boolean }
 
@@ -231,10 +232,11 @@ function AgingChart({ items }: { items: WorkItem[] }) {
   const tooltipContent = ({ payload }: { payload?: Array<{ payload: { id: string; status: string; age: number } }> }) => {
     if (!payload?.length) return null
     const d = payload[0].payload
-    const zone = d.age > p95 ? '🔴 Crítico' : d.age > p85 ? '🟠 Atenção' : '🟢 Normal'
+    const zone = d.age > p95 ? 'Crítico' : d.age > p85 ? 'Atenção' : 'Normal'
+    const zoneColor = d.age > p95 ? '#EF4444' : d.age > p85 ? '#F59E0B' : '#10B981'
     return (
       <div className="bg-white border border-[#F2C5BB] px-3 py-2 rounded shadow text-xs">
-        <div className="font-bold text-[#092140] mb-1">{zone}</div>
+        <div className="font-bold mb-1 flex items-center gap-1" style={{ color: zoneColor }}><IconCircleDot size={8} />{zone}</div>
         <div>ID: {d.id}</div>
         <div>Status: {d.status}</div>
         <div>Idade: {d.age} dias</div>
@@ -289,7 +291,7 @@ function AgingChart({ items }: { items: WorkItem[] }) {
           {/* Top 10 mais envelhecidos */}
           {top10.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs font-bold text-[#092140] mb-2">🔝 Top 10 itens mais envelhecidos</p>
+              <p className="text-xs font-bold text-[#092140] mb-2 flex items-center gap-1.5"><IconTrophy size={13} className="text-[#BF452A]" /> Top 10 itens mais envelhecidos</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse">
                   <thead>
@@ -311,7 +313,7 @@ function AgingChart({ items }: { items: WorkItem[] }) {
                           <td className="px-3 py-1.5 font-mono font-semibold text-[#092140]">{item.id}</td>
                           <td className="px-3 py-1.5 text-[#555]">{item.status}</td>
                           <td className="px-3 py-1.5 text-right font-bold" style={{ color: isCritical ? '#EF4444' : isWarning ? '#F59E0B' : '#10B981' }}>{item.age}d</td>
-                          <td className="px-3 py-1.5 text-center">{isCritical ? '🔴' : isWarning ? '🟠' : '🟢'}</td>
+                          <td className="px-3 py-1.5 text-center"><IconCircleDot size={8} style={{ color: isCritical ? '#EF4444' : isWarning ? '#F59E0B' : '#10B981' }} /></td>
                         </tr>
                       )
                     })}

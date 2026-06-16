@@ -4,6 +4,7 @@ import { getPercentile, getGroupLabel, computeThroughputMedian } from "../lib/ma
 import type { GroupBy } from "../types"
 import Charts from "./charts/Charts"
 import InsightsPanel from "./InsightsPanel"
+import { IconWarning, IconInfo } from "./Icons"
 
 export default function DashboardScreen() {
   const {
@@ -130,7 +131,7 @@ export default function DashboardScreen() {
       <main className="flex-1 p-6 overflow-y-auto print:w-full print:p-0">
         {hasNoConcluded && (
           <div className="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
-            <span>⚠️</span><span>{t.dashboard.wipOnly}</span>
+            <IconWarning size={15} className="shrink-0 mt-0.5" /><span>{t.dashboard.wipOnly}</span>
           </div>
         )}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
@@ -150,7 +151,7 @@ export default function DashboardScreen() {
         </div>
         {isLastPartial && (
           <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded text-xs">
-            ℹ️ Último período incompleto — excluído do cálculo do Throughput mediano ({tpMedian}/semana).
+            <span className="flex items-center gap-1.5"><IconInfo size={13} className="shrink-0" /> Último período incompleto — excluído do cálculo do Throughput mediano ({tpMedian}/semana).</span>
           </div>
         )}
         <InsightsPanel items={filteredItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />

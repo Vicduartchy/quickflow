@@ -77,12 +77,12 @@ export default function UploadScreen() {
         {/* Cards de benefício */}
         <div className="grid grid-cols-3 gap-3 mb-8 text-center">
           {[
-            { icon: '📊', title: 'Cycle Time & Throughput', desc: 'Percentis P50, P85, P95 e mediana de entregas por período.' },
-            { icon: '🔍', title: 'Aging WIP', desc: 'Veja quais itens estão envelhecendo além do limite saudável.' },
-            { icon: '🔒', title: '100% Privado', desc: 'Seus dados nunca saem do seu navegador.' },
-          ].map(({ icon, title, desc }) => (
+            { Icon: IconBarChart, title: 'Cycle Time & Throughput', desc: 'Percentis P50, P85, P95 e mediana de entregas por período.' },
+            { Icon: IconClock, title: 'Aging WIP', desc: 'Veja quais itens estão envelhecendo além do limite saudável.' },
+            { Icon: IconLock, title: '100% Privado', desc: 'Seus dados nunca saem do seu navegador.' },
+          ].map(({ Icon, title, desc }) => (
             <div key={title} className="bg-white border border-[#F2C5BB] rounded-xl p-4 shadow-sm">
-              <div className="text-2xl mb-2">{icon}</div>
+              <div className="flex justify-center mb-2"><Icon size={24} className="text-[#BF452A]" /></div>
               <div className="text-xs font-bold text-[#092140] mb-1">{title}</div>
               <div className="text-xs text-[#888] leading-snug">{desc}</div>
             </div>
@@ -100,7 +100,7 @@ export default function UploadScreen() {
           className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors
             ${dragging ? 'border-[#BF452A] bg-[#F2C5BB]/20' : 'border-[#D99789] hover:border-[#BF452A] hover:bg-[#F2C5BB]/10'}`}
         >
-          <div className="text-5xl mb-4">📂</div>
+          <div className="flex justify-center mb-4"><IconBarChart size={44} className="text-[#D99789]" /></div>
           <p className="text-[#092140] font-semibold mb-1">{t.upload.button}</p>
           <p className="text-[#D99789] text-sm">{t.upload.or}</p>
           <p className="text-[#D99789] text-xs mt-2">.csv, .xlsx</p>
@@ -111,7 +111,7 @@ export default function UploadScreen() {
 
         {/* Aviso de privacidade */}
         <div className="mt-5 flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-xs">
-          <span className="text-base leading-none mt-0.5">⚠️</span>
+          <IconWarning size={15} className="shrink-0 mt-0.5 text-amber-600" />
           <span>
             <strong>Seus dados ficam apenas no seu navegador.</strong> O QuickFlow não envia nem armazena nenhuma informação em servidores. Se você atualizar ou fechar a página, os dados serão perdidos.
           </span>
@@ -132,7 +132,7 @@ export default function UploadScreen() {
             rel="noopener noreferrer"
             className="shrink-0 px-4 py-2 bg-[#BF452A] hover:bg-[#a33a22] text-white text-xs font-bold rounded-full transition-colors whitespace-nowrap"
           >
-            Conheça o trabalho ↗
+            <span className="flex items-center gap-1.5">Conheça o trabalho <IconExternalLink size={12} /></span>
           </a>
         </div>
       </div>

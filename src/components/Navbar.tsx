@@ -1,4 +1,5 @@
 import { useApp } from '../lib/context'
+import { IconArrowLeft } from './Icons'
 
 export default function Navbar() {
   const { lang, toggleLang, resetAll, step } = useApp()
@@ -22,7 +23,7 @@ export default function Navbar() {
             onClick={resetAll}
             className="text-sm font-medium bg-[#BF452A] hover:bg-[#a33a22] text-white px-4 py-1.5 rounded-full transition-colors flex items-center gap-1.5"
           >
-            <span>↩</span> Nova análise
+            <IconArrowLeft size={14} /> Nova análise
           </button>
         )}
         <button onClick={toggleLang} className="text-sm text-[#D99789] hover:text-white border border-[#D99789] hover:border-white px-3 py-1 rounded transition-colors">

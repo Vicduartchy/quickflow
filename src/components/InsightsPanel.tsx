@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { WorkItem, GroupBy } from '../types'
 import { getPercentile, getGroupKey, computeThroughputMedian } from '../lib/mapping'
+import { IconWarning, IconCheck, IconInfo, IconSearch } from './Icons'
 
 interface Props {
   items: WorkItem[]
@@ -153,10 +154,10 @@ function generateInsights(items: WorkItem[], groupBy: GroupBy, excludeZeroCT: bo
   return insights
 }
 
-const ICON: Record<Insight['type'], string> = {
-  warning: '⚠️',
-  success: '✅',
-  info: 'ℹ️',
+const ICON_COMPONENT: Record<Insight['type'], React.FC<{ size?: number; className?: string }>> = {
+  warning: IconWarning,
+  success: IconCheck,
+  info: IconInfo,
 }
 
 const STYLE: Record<Insight['type'], string> = {
@@ -182,7 +183,7 @@ export default function InsightsPanel({ items, groupBy, excludeZeroCT }: Props) 
   return (
     <div className="mb-6">
       <h2 className="font-bold text-[#092140] text-sm mb-3 flex items-center gap-2">
-        <span className="text-base">🔍</span> Insights de Gestão de Fluxo
+        <IconSearch size={15} className="text-[#BF452A]" /> Insights de Gestão de Fluxo
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {insights.map((insight, i) => (
@@ -191,7 +192,7 @@ export default function InsightsPanel({ items, groupBy, excludeZeroCT }: Props) 
             className={`border rounded-xl px-4 py-3 text-xs leading-relaxed ${STYLE[insight.type]}`}
           >
             <div className={`font-bold mb-1 flex items-center gap-1.5 ${TITLE_STYLE[insight.type]}`}>
-              <span>{ICON[insight.type]}</span>
+              {(() => { const IC = ICON_COMPONENT[insight.type]; return <IC size={13} />; })()}
               <span>{insight.title}</span>
             </div>
             <p>{insight.body}</p>
