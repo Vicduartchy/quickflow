@@ -50,9 +50,10 @@ function Card({
         <button
           onClick={() => setOpen(o => !o)}
           title="Como ler este gráfico"
-          className="ml-2 shrink-0 w-5 h-5 rounded-full border border-[#D99789] text-[#D99789] hover:bg-[#F2C5BB] hover:text-[#092140] flex items-center justify-center text-xs font-bold transition-colors"
+          className="ml-2 shrink-0 flex items-center gap-1 px-2 py-1 rounded-full border border-[#D99789] text-[#D99789] hover:bg-[#F2C5BB] hover:text-[#092140] text-xs font-semibold transition-colors"
         >
-          ?
+          <span className="font-bold">?</span>
+          <span className="hidden sm:inline">Como ler</span>
         </button>
       </div>
       <p className="text-[#D99789] text-xs mb-2">{desc}</p>
@@ -102,27 +103,38 @@ function ScatterplotChart({ items }: { items: WorkItem[]; groupBy: GroupBy }) {
               </div>
             ))}
           </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <ScatterChart margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={C.blush} />
-              <XAxis dataKey="x" type="number" domain={['auto', 'auto']} tick={{ fontSize: 10, fill: C.salmon }}
-                tickFormatter={v => new Date(v).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })} />
-              <YAxis dataKey="y" tick={{ fontSize: 11, fill: C.salmon }} unit="d" />
-              <Tooltip content={({ payload }) => {
-                if (!payload?.length) return null
-                const d = payload[0].payload
-                return (
-                  <div className="bg-white border border-[#F2C5BB] px-3 py-2 rounded shadow text-xs">
-                    <div>ID: {d.id}</div><div>CT: {d.y}d</div><div>{new Date(d.x).toLocaleDateString('pt-BR')}</div>
-                  </div>
-                )
-              }} />
-              <ReferenceLine y={p50} stroke={C.terra} strokeDasharray="4 2" />
-              <ReferenceLine y={p85} stroke={C.salmon} strokeDasharray="4 2" />
-              <ReferenceLine y={p95} stroke={C.navy} strokeDasharray="4 2" />
-              <Scatter data={data} fill={C.terra} fillOpacity={0.6} r={3} />
-            </ScatterChart>
-          </ResponsiveContainer>
+          <div className="flex">
+            <ResponsiveContainer width="100%" height={260}>
+              <ScatterChart margin={{ top: 10, right: 8, bottom: 10, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={C.blush} />
+                <XAxis dataKey="x" type="number" domain={['auto', 'auto']} tick={{ fontSize: 10, fill: C.salmon }}
+                  tickFormatter={v => new Date(v).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })} />
+                <YAxis dataKey="y" tick={{ fontSize: 11, fill: C.salmon }} unit="d" />
+                <Tooltip content={({ payload }) => {
+                  if (!payload?.length) return null
+                  const d = payload[0].payload
+                  return (
+                    <div className="bg-white border border-[#F2C5BB] px-3 py-2 rounded shadow text-xs">
+                      <div>ID: {d.id}</div><div>CT: {d.y}d</div><div>{new Date(d.x).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                  )
+                }} />
+                <ReferenceLine y={p50} stroke={C.terra} strokeDasharray="4 2" />
+                <ReferenceLine y={p85} stroke={C.salmon} strokeDasharray="4 2" />
+                <ReferenceLine y={p95} stroke={C.navy} strokeDasharray="4 2" />
+                <Scatter data={data} fill={C.terra} fillOpacity={0.6} r={3} />
+              </ScatterChart>
+            </ResponsiveContainer>
+            {/* Rótulos dos percentis fora do gráfico, à direita */}
+            <div className="flex flex-col justify-between pl-2 py-2" style={{ height: 260 }}>
+              {[{ label: 'P95', value: p95, color: C.navy }, { label: 'P85', value: p85, color: C.salmon }, { label: 'P50', value: p50, color: C.terra }].map(({ label, value, color }) => (
+                <div key={label} className="flex flex-col items-start">
+                  <span className="text-[10px] font-bold leading-none" style={{ color }}>{label}</span>
+                  <span className="text-[10px] leading-none" style={{ color }}>{value}d</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </>
       )}
     </Card>
