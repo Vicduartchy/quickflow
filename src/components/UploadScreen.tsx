@@ -79,6 +79,28 @@ export default function UploadScreen() {
         </div>
         {loading && <div className="mt-4 text-center text-[#BF452A] font-medium animate-pulse">Processando arquivo...</div>}
         {error && <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>}
+
+        {/* Aviso de privacidade */}
+        <div className="mt-5 flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-xs">
+          <span className="text-base leading-none mt-0.5">⚠️</span>
+          <span>
+            <strong>Seus dados ficam apenas no seu navegador.</strong> O QuickFlow não envia nem armazena nenhuma informação em servidores. Se você atualizar ou fechar a página, os dados serão perdidos.
+          </span>
+        </div>
+
+        {/* Link para a criadora */}
+        <div className="mt-6 text-center">
+          <a
+            href="https://vicduarte.site/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-[#BF452A] hover:text-[#092140] transition-colors group"
+          >
+            <img src="/quickflow/logo-icon.png" alt="Vic Duarte" className="w-5 h-5 object-contain" />
+            <span className="underline underline-offset-2 group-hover:no-underline">Conheça a criadora deste sistema</span>
+            <span className="text-[#D99789]">↗</span>
+          </a>
+        </div>
       </div>
     </div>
   )
