@@ -17,9 +17,14 @@ export default function UploadScreen() {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target!.result as ArrayBuffer)
-        const wb = XLSX.read(data, { type: 'array', cellDates: false })
+        // CSVs devem ser lidos com raw:true para preservar datas como texto
+        // XLSX/XLS usam cellDates:true para converter seriais corretamente
+        const isCSV = file.name.toLowerCase().endsWith('.csv')
+        const wb = isCSV
+          ? XLSX.read(data, { type: 'array', raw: true })
+          : XLSX.read(data, { type: 'array', cellDates: true })
         const ws = wb.Sheets[wb.SheetNames[0]]
-        const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' })
+        const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '', raw: isCSV })
         if (rows.length === 0) {
           setError('Arquivo vazio ou sem dados.')
           setLoading(false)

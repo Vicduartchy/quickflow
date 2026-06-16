@@ -2,23 +2,49 @@ import type { WorkItem, ColumnMapping, GroupBy } from '../types'
 
 export function parseDate(value: unknown): Date | undefined {
   if (!value) return undefined
+
+  // Objeto Date nativo (vindo de cellDates:true no XLSX)
+  if (value instanceof Date) {
+    if (!isNaN(value.getTime())) return new Date(value.getFullYear(), value.getMonth(), value.getDate())
+    return undefined
+  }
+
   const str = String(value).trim()
+
+  // dd/mm/yyyy hh:mm:ss  ou  dd/mm/yyyy  (formato brasileiro)
   const dmyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/)
   if (dmyMatch) {
     const [, d, m, y] = dmyMatch
     const date = new Date(Number(y), Number(m) - 1, Number(d))
     if (!isNaN(date.getTime())) return date
   }
+
+  // yyyy-mm-dd  (formato ISO)
   const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/)
   if (isoMatch) {
     const [, y, m, d] = isoMatch
     const date = new Date(Number(y), Number(m) - 1, Number(d))
     if (!isNaN(date.getTime())) return date
   }
-  if (typeof value === 'number' && value > 1000) {
-    const date = new Date(Math.round((value - 25569) * 86400 * 1000))
+
+  // M/D/YY ou M/D/YYYY  (formato Excel/en-US: mês/dia/ano)
+  const mdyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/)
+  if (mdyMatch) {
+    const [, m, d, yRaw] = mdyMatch
+    const y = yRaw.length === 2 ? 2000 + Number(yRaw) : Number(yRaw)
+    const date = new Date(y, Number(m) - 1, Number(d))
     if (!isNaN(date.getTime())) return date
   }
+
+  // Serial numérico do Excel (fallback)
+  if (typeof value === 'number' && value > 1000) {
+    // Converter serial para UTC e extrair data sem offset de fuso
+    const utcMs = Math.round((value - 25569) * 86400 * 1000)
+    const utcDate = new Date(utcMs)
+    const date = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate())
+    if (!isNaN(date.getTime())) return date
+  }
+
   return undefined
 }
 
