@@ -176,30 +176,61 @@ function ThroughputRunChart({ items, groupBy }: { items: WorkItem[]; groupBy: Gr
 function AgingChart({ items }: { items: WorkItem[] }) {
   // Sempre usa a data de hoje como referência — itens sem Closed Date estão em andamento agora
   const refDate = new Date()
-  const data = items.map(i => ({
-    id: i.id,
-    status: i.currentStatus ?? 'Unknown',
-    age: Math.round((refDate.getTime() - i.entryDate.getTime()) / (1000 * 60 * 60 * 24)),
-  }))
+
+  // Obtém statuses únicos ordenados
+  const statuses = useMemo(() => {
+    const s = [...new Set(items.map(i => i.currentStatus ?? 'Unknown'))]
+    return s.sort()
+  }, [items])
+
+  // Converte status em índice numérico + jitter para separar os pontos visualmente
+  const data = useMemo(() => items.map((i, idx) => {
+    const status = i.currentStatus ?? 'Unknown'
+    const statusIdx = statuses.indexOf(status)
+    // Jitter determinístico baseado no índice do item para espalhar os pontos
+    const jitter = ((idx * 2654435761) % 1000) / 1000 * 0.7 - 0.35
+    return {
+      id: i.id,
+      status,
+      statusIdx: statusIdx + jitter,
+      age: Math.round((refDate.getTime() - i.entryDate.getTime()) / (1000 * 60 * 60 * 24)),
+    }
+  }), [items, statuses])
+
   const ages = data.map(d => d.age).sort((a, b) => a - b)
   const p85 = getPercentile(ages, 85)
   const p95 = getPercentile(ages, 95)
 
   const explanation =
     'Mostra os itens que ainda estão em andamento (sem data de conclusão) e há quantos dias cada um está no fluxo, calculado sempre a partir de hoje. ' +
-    'O eixo horizontal é a idade do item em dias; o eixo vertical é o status atual. ' +
-    'Pontos além da linha P85 estão envelhecendo mais do que 85% dos itens já entregues — são candidatos prioritários para desbloqueio. ' +
-    'Pontos além do P95 representam anomalias graves e devem ser tratados com urgência. ' +
-    'Concentrações de pontos em um mesmo status indicam gargalos naquela etapa do fluxo.'
+    'O eixo X mostra o status atual; o eixo Y mostra a idade em dias. ' +
+    'Cada ponto é um item WIP — pontos acima da linha P85 estão envelhecendo mais do que 85% dos itens já entregues e são candidatos prioritários para desbloqueio. ' +
+    'Pontos acima do P95 representam anomalias graves e devem ser tratados com urgência. ' +
+    'Colunas com muitos pontos altos indicam gargalos naquele status.'
 
   return (
-    <Card title="Aging Chart" desc="Tempo em andamento dos itens WIP." explanation={explanation}>
+    <Card title="Aging Chart" desc="Tempo em andamento dos itens WIP (X = status, Y = dias)." explanation={explanation}>
       {data.length === 0 ? <Empty msg="Nenhum item em andamento." /> : (
-        <ResponsiveContainer width="100%" height={260}>
-          <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 0 }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 40 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={C.blush} />
-            <XAxis dataKey="age" type="number" tick={{ fontSize: 11, fill: C.salmon }} unit="d" />
-            <YAxis dataKey="status" type="category" tick={{ fontSize: 10, fill: C.navy }} width={100} />
+            <XAxis
+              dataKey="statusIdx"
+              type="number"
+              domain={[-0.5, statuses.length - 0.5]}
+              ticks={statuses.map((_, i) => i)}
+              tickFormatter={(v: number) => statuses[Math.round(v)] ?? ''}
+              tick={{ fontSize: 10, fill: C.navy }}
+              angle={-30}
+              textAnchor="end"
+              interval={0}
+            />
+            <YAxis
+              dataKey="age"
+              type="number"
+              tick={{ fontSize: 11, fill: C.salmon }}
+              unit="d"
+            />
             <Tooltip content={({ payload }) => {
               if (!payload?.length) return null
               const d = payload[0].payload
@@ -209,9 +240,9 @@ function AgingChart({ items }: { items: WorkItem[] }) {
                 </div>
               )
             }} />
-            <ReferenceLine x={p85} stroke={C.salmon} strokeDasharray="4 2" label={{ value: `P85:${p85}d`, fill: C.salmon, fontSize: 10 }} />
-            <ReferenceLine x={p95} stroke={C.terra} strokeDasharray="4 2" label={{ value: `P95:${p95}d`, fill: C.terra, fontSize: 10 }} />
-            <Scatter data={data} fill={C.navy} fillOpacity={0.7} r={4} />
+            <ReferenceLine y={p85} stroke={C.salmon} strokeDasharray="4 2" label={{ value: `P85: ${p85}d`, position: 'insideTopRight', fill: C.salmon, fontSize: 10 }} />
+            <ReferenceLine y={p95} stroke={C.terra} strokeDasharray="4 2" label={{ value: `P95: ${p95}d`, position: 'insideTopRight', fill: C.terra, fontSize: 10 }} />
+            <Scatter data={data} fill={C.navy} fillOpacity={0.5} r={3} />
           </ScatterChart>
         </ResponsiveContainer>
       )}
