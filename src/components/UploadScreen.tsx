@@ -61,6 +61,9 @@ export default function UploadScreen() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-56px)] px-4">
       <div className="w-full max-w-lg">
+        <div className="mb-6">
+          <img src="/quickflow/logo-dark.png" alt="Vic Duarte" className="h-12 object-contain" />
+        </div>
         <h1 className="text-3xl font-bold text-[#092140] mb-2">{t.upload.title}</h1>
         <p className="text-[#D99789] mb-8">{t.upload.subtitle}</p>
         <div
@@ -71,7 +74,7 @@ export default function UploadScreen() {
           className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors
             ${dragging ? 'border-[#BF452A] bg-[#F2C5BB]/20' : 'border-[#D99789] hover:border-[#BF452A] hover:bg-[#F2C5BB]/10'}`}
         >
-          <div className="text-5xl mb-4">📊</div>
+          <div className="text-5xl mb-4">📂</div>
           <p className="text-[#092140] font-semibold mb-1">{t.upload.button}</p>
           <p className="text-[#D99789] text-sm">{t.upload.or}</p>
           <p className="text-[#D99789] text-xs mt-2">.csv, .xlsx</p>
@@ -96,7 +99,7 @@ export default function UploadScreen() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm text-[#BF452A] hover:text-[#092140] transition-colors group"
           >
-            <img src="/quickflow/logo-icon.png" alt="Vic Duarte" className="w-5 h-5 object-contain" />
+            <img src="/quickflow/logo-dark.png" alt="Vic Duarte" className="h-5 object-contain" />
             <span className="underline underline-offset-2 group-hover:no-underline">Conheça a criadora deste sistema</span>
             <span className="text-[#D99789]">↗</span>
           </a>
