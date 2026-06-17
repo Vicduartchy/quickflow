@@ -65,8 +65,12 @@ export default function UploadScreen() {
 
         {/* Hero */}
         <div className="mb-8 text-center">
-          <img src="/quickflow/logo-dark.png" alt="Vic Duarte" className="h-12 object-contain mx-auto mb-5" />
-          <h1 className="text-4xl font-bold text-[#092140] mb-3">QuickFlow</h1>
+          {/* Logo QuickFlow principal */}
+          <img
+            src="/quickflow/quickflow-logo-dark.png"
+            alt="QuickFlow"
+            className="h-16 object-contain mx-auto mb-5"
+          />
           <p className="text-lg text-[#BF452A] font-medium mb-4">Métricas de fluxo ágil, sem complicação.</p>
           <p className="text-[#555] text-sm leading-relaxed max-w-xl mx-auto">
             O <strong>QuickFlow</strong> transforma sua planilha do Azure DevOps, Jira ou Trello em um dashboard completo de gestão de fluxo —
@@ -136,6 +140,7 @@ export default function UploadScreen() {
             <span className="flex items-center gap-1.5">Conheça o trabalho <IconExternalLink size={12} /></span>
           </a>
         </div>
+
       </div>
     </div>
   )

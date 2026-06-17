@@ -31,15 +31,40 @@ function ScrollToTop() {
   )
 }
 
+function Footer() {
+  return (
+    <footer className="bg-[#092140] text-white mt-12 py-6 px-6 print:hidden">
+      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Logos */}
+        <div className="flex items-center gap-3">
+          <img src="/quickflow/quickflow-logo-white.png" alt="QuickFlow" className="h-7 object-contain" />
+          <span className="text-white/30 text-lg font-thin select-none">|</span>
+          <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-5 object-contain opacity-70" />
+        </div>
+
+        {/* Copyright */}
+        <p className="text-[#D99789] text-xs text-center sm:text-right leading-relaxed">
+          © 2026 <a href="https://vicduarte.site/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Vic Duarte</a>.
+          Todos os direitos reservados.{' '}
+          <span className="text-white/40">QuickFlow é uma ferramenta open source e gratuita.</span>
+        </p>
+      </div>
+    </footer>
+  )
+}
+
 function Inner() {
   const { step } = useApp()
   return (
-    <div className="min-h-screen bg-[#F2F2F2] font-sans">
+    <div className="min-h-screen bg-[#F2F2F2] font-sans flex flex-col">
       <Navbar />
-      {step === "upload" && <UploadScreen />}
-      {step === "mapping" && <MappingScreen />}
-      {step === "policy" && <PolicyScreen />}
-      {step === "dashboard" && <DashboardScreen />}
+      <main className="flex-1">
+        {step === "upload" && <UploadScreen />}
+        {step === "mapping" && <MappingScreen />}
+        {step === "policy" && <PolicyScreen />}
+        {step === "dashboard" && <DashboardScreen />}
+      </main>
+      <Footer />
       <ScrollToTop />
     </div>
   )

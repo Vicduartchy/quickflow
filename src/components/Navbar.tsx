@@ -5,9 +5,13 @@ export default function Navbar() {
   const { lang, toggleLang, resetAll, step } = useApp()
   return (
     <nav className="bg-[#092140] text-white px-6 py-3 flex items-center justify-between shadow">
-      <button onClick={resetAll} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-8 object-contain" />
-        <span className="font-bold text-lg tracking-tight">QuickFlow</span>
+      <button onClick={resetAll} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        {/* Logo QuickFlow (nova identidade) */}
+        <img src="/quickflow/quickflow-logo-white.png" alt="QuickFlow" className="h-8 object-contain" />
+        {/* Separador */}
+        <span className="text-white/30 text-lg font-thin select-none">|</span>
+        {/* Logo Vic Duarte */}
+        <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-6 object-contain opacity-80" />
       </button>
       <div className="flex items-center gap-4">
         {step !== 'upload' && (
