@@ -1,23 +1,149 @@
-<div align="center">
-  <div style="background-color: #BF452A; width: 64px; height: 64px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-    <span style="color: white; font-weight: bold; font-size: 32px; font-family: sans-serif;">Q</span>
-  </div>
-  <h1>QuickFlow</h1>
-  <p><strong>Ferramenta client-side para análise de métricas de fluxo ágil</strong></p>
-</div>
+# 📊 QuickFlow
 
-<br>
+[![Deploy Status](https://img.shields.io/badge/deploy-GitHub%20Pages-222?logo=github)](https://vicduartchy.github.io/quickflow/)
+[![Tests](https://img.shields.io/badge/testes-45%20passing-brightgreen?logo=vitest)](src/lib)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-O QuickFlow é uma aplicação web desenvolvida para auxiliar equipes de desenvolvimento de software a extrair, visualizar e analisar métricas de fluxo a partir de planilhas exportadas de ferramentas como Azure DevOps, Jira e Trello. A ferramenta opera de forma totalmente client-side, o que significa que nenhum dado é enviado para servidores externos, garantindo a privacidade e a segurança das informações do projeto.
+> Ferramenta client-side para análise de métricas de fluxo ágil — sem backend, sem cadastro, seus dados ficam só no seu navegador.
 
-A aplicação foi construída com foco na simplicidade e na eficiência, permitindo que líderes técnicos, Scrum Masters e Agile Coaches obtenham insights rápidos sobre a saúde do fluxo de trabalho. O sistema suporta arquivos nos formatos CSV e XLSX, realizando o processamento localmente no navegador do usuário.
+## 🚀 Sobre o Projeto
 
-A interface guia o usuário por um processo de quatro etapas. Inicialmente, ocorre o upload da planilha com os dados brutos. Em seguida, o sistema realiza um mapeamento inteligente das colunas, detectando automaticamente campos como identificador, tipo, equipe, data de entrada, data de saída e status atual. Na terceira etapa, o usuário define a política de fluxo, classificando os status em categorias como Backlog, WIP (Work In Progress) e Concluído. Por fim, o dashboard interativo é gerado com base nas configurações estabelecidas.
+O QuickFlow transforma planilhas exportadas do Azure DevOps, Jira ou Trello em dashboards interativos com as principais métricas de fluxo ágil. A análise acontece 100% no navegador, sem envio de dados para nenhum servidor.
 
-O dashboard principal oferece uma visão abrangente do desempenho da equipe, apresentando métricas fundamentais como Cycle Time (percentis P50, P85 e P95) e Throughput (mediana). A ferramenta disponibiliza gráficos essenciais para a gestão ágil, incluindo Scatterplot de Cycle Time, Run Chart de Throughput, Aging WIP, Histograma de Cycle Time, Cumulative Flow Diagram (CFD) e Breakdown Chart. Os usuários podem aplicar filtros por período, equipe, tipo de item e status, além de ajustar o agrupamento temporal por dia, semana, mês ou ano.
+**🌐 Acesse:** [vicduartchy.github.io/quickflow](https://vicduartchy.github.io/quickflow/)
 
-A arquitetura do projeto baseia-se em tecnologias modernas de front-end. O desenvolvimento utiliza React 18 com TypeScript, garantindo tipagem estática e componentes reutilizáveis. O Vite atua como ferramenta de build, proporcionando inicialização rápida e Hot Module Replacement (HMR). A estilização é gerenciada pelo Tailwind CSS, enquanto a biblioteca Recharts é empregada para a renderização dos gráficos interativos. A aplicação também conta com um sistema de internacionalização nativo, oferecendo suporte aos idiomas Português (pt-BR) e Inglês (en-US).
+## ✨ Funcionalidades
 
-Para executar o projeto localmente, é necessário ter o Node.js instalado. O processo de instalação envolve clonar o repositório, instalar as dependências e iniciar o servidor de desenvolvimento. O comando `npm install` prepara o ambiente, e `npm run dev` disponibiliza a aplicação no endereço local padrão. Para construir a versão de produção, utiliza-se o comando `npm run build`, que gera os arquivos otimizados na pasta `dist`.
+- **📁 Upload de dados:** Suporte a arquivos CSV e XLSX diretamente no navegador
+- **🔍 Mapeamento inteligente:** Detecção automática de colunas do Azure DevOps e Jira
+- **⚙️ Política de fluxo:** Classificação de status em Backlog, WIP e Concluído
+- **📈 Dashboard interativo:** 6 gráficos com filtros por período, equipe, tipo e status
+- **💡 Insights automáticos:** Alertas gerados a partir dos dados do Kanban
+- **🌐 Bilíngue:** Interface em Português (pt-BR) e Inglês (en-US)
+- **📸 Exportação:** Download do dashboard como imagem via html2canvas
+- **🔒 Privacidade total:** Nenhum dado sai do seu navegador (localStorage)
 
-O QuickFlow representa uma solução prática para equipes que buscam compreender e melhorar sua previsibilidade e eficiência, transformando dados brutos em informações acionáveis sem a necessidade de configurações complexas ou integrações de backend.
+## 📈 Métricas e Gráficos
+
+| Gráfico | O que mostra |
+|---|---|
+| **Scatterplot de Cycle Time** | Distribuição do tempo de ciclo por item |
+| **Run Chart de Throughput** | Volume de entregas por período |
+| **Aging WIP** | Itens em andamento e há quanto tempo estão parados |
+| **Histograma de Cycle Time** | Frequência dos tempos de ciclo |
+| **Cumulative Flow Diagram (CFD)** | Acúmulo de itens por status ao longo do tempo |
+| **Breakdown Chart** | Composição das entregas por tipo ou equipe |
+
+**Métricas-chave:** Cycle Time P50, P85, P95 · Throughput (mediana)
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Frontend:** React 19 + TypeScript
+- **Build:** Vite 8
+- **Estilização:** Tailwind CSS 4
+- **Gráficos:** Recharts 3
+- **Leitura de planilhas:** SheetJS (xlsx)
+- **Exportação de imagem:** html2canvas
+- **Testes:** Vitest 4 (45 testes unitários)
+- **Deploy:** GitHub Pages via GitHub Actions
+
+## 📁 Estrutura do Projeto
+
+```
+quickflow/
+├── src/
+│   ├── main.tsx                  # Ponto de entrada da aplicação
+│   ├── App.tsx                   # Roteamento entre telas
+│   ├── types/
+│   │   └── index.ts              # Tipos globais (WorkItem, ColumnMapping, etc.)
+│   ├── i18n/
+│   │   └── translations.ts       # Textos em pt-BR e en-US
+│   ├── lib/
+│   │   ├── context.tsx           # Estado global com React Context
+│   │   ├── mapping.ts            # Lógica de parsing e cálculo de métricas
+│   │   ├── mapping.test.ts       # 36 testes unitários de mapping
+│   │   ├── storage.ts            # Persistência no localStorage
+│   │   └── storage.test.ts       # 9 testes unitários de storage
+│   └── components/
+│       ├── Navbar.tsx            # Barra de navegação
+│       ├── UploadScreen.tsx      # Tela 1 — upload do arquivo
+│       ├── MappingScreen.tsx     # Tela 2 — mapeamento de colunas
+│       ├── PolicyScreen.tsx      # Tela 3 — política de fluxo
+│       ├── DashboardScreen.tsx   # Tela 4 — dashboard com métricas
+│       ├── InsightsPanel.tsx     # Painel de insights automáticos
+│       ├── Icons.tsx             # Ícones SVG inline
+│       └── charts/
+│           └── Charts.tsx        # 6 gráficos Recharts
+├── .github/
+│   └── workflows/
+│       └── deploy.yml            # CI/CD para GitHub Pages
+├── vite.config.ts                # Config do Vite + Vitest
+└── package.json
+```
+
+## 🎨 Design
+
+- **Cor principal:** Laranja `#BF452A`
+- **Tipografia:** Sistema nativo do navegador (sans-serif)
+- **Layout:** Responsivo, mobile-first
+- **Tema:** Dark-friendly com Tailwind CSS
+
+## 🚀 Como Executar Localmente
+
+```bash
+# Clone o repositório
+git clone https://github.com/Vicduartchy/quickflow.git
+
+# Entre no diretório
+cd quickflow
+
+# Instale as dependências
+npm install
+
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+Acesse: `http://localhost:5173`
+
+## 🧪 Testes
+
+```bash
+# Rodar todos os testes (45 testes)
+npm test
+
+# Modo watch (reexecuta ao salvar)
+npm run test:watch
+
+# Relatório de cobertura
+npm run test:coverage
+```
+
+## 📦 Deploy
+
+O deploy é feito automaticamente no GitHub Pages a cada push na branch `main`.
+
+```bash
+# Build de produção
+npm run build
+```
+
+**URL de produção:** [vicduartchy.github.io/quickflow](https://vicduartchy.github.io/quickflow/)
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👩‍💼 Sobre Vic Duarte
+
+**Victoria Duarte** é especialista em gestão de projetos, metodologias ágeis e liderança. Professora de pós-graduação e criadora do QuickFlow — uma ferramenta construída para colocar métricas de fluxo ao alcance de qualquer equipe ágil.
+
+### 🔗 Conecte-se
+
+- **LinkedIn:** [Vic Duarte](https://www.linkedin.com/in/vic-duarte/)
+- **Site:** [vicduarte.site](https://vicduarte.site)
+- **E-mail:** victoriaduarte.s@gmail.com
+
+---
+
+**Desenvolvido com 💙 por Vic Duarte**
