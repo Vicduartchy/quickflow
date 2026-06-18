@@ -37,9 +37,9 @@ function Footer() {
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Logos */}
         <div className="flex items-center gap-3">
-          <img src="/quickflow/quickflow-logo-white.png" alt="QuickFlow" className="h-7 object-contain" />
+          <img src="/quickflow/quickflow-logo-dark.png" alt="QuickFlow" className="h-10 object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
           <span className="text-white/30 text-lg font-thin select-none">|</span>
-          <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-5 object-contain opacity-70" />
+          <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-7 object-contain" />
         </div>
 
         {/* Copyright */}

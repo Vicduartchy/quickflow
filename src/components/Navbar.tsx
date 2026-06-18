@@ -6,12 +6,12 @@ export default function Navbar() {
   return (
     <nav className="bg-[#092140] text-white px-6 py-3 flex items-center justify-between shadow">
       <button onClick={resetAll} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-        {/* Logo QuickFlow (nova identidade) */}
-        <img src="/quickflow/quickflow-logo-white.png" alt="QuickFlow" className="h-8 object-contain" />
+        {/* Logo QuickFlow — versão escura com filtro CSS para branco (mantém transparência) */}
+        <img src="/quickflow/quickflow-logo-dark.png" alt="QuickFlow" className="h-10 object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
         {/* Separador */}
         <span className="text-white/30 text-lg font-thin select-none">|</span>
         {/* Logo Vic Duarte */}
-        <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-6 object-contain opacity-80" />
+        <img src="/quickflow/logo-white.png" alt="Vic Duarte" className="h-8 object-contain" />
       </button>
       <div className="flex items-center gap-4">
         {step !== 'upload' && (
