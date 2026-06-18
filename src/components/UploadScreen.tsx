@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx'
 import { useApp } from '../lib/context'
 import { autoMapColumns, buildWorkItems } from '../lib/mapping'
 import { IconBarChart, IconClock, IconLock, IconWarning, IconExternalLink } from './Icons'
+import { Button } from './ui/button'
+import { Alert, AlertDescription } from './ui/alert'
 
 export default function UploadScreen() {
   const { t, setStep, setRawRows, setHeaders, setWorkItems, setMapping } = useApp()
@@ -65,7 +67,6 @@ export default function UploadScreen() {
 
         {/* Hero */}
         <div className="mb-8 text-center">
-          {/* Logo QuickFlow principal */}
           <img
             src="/quickflow/quickflow-logo-dark.png"
             alt="QuickFlow"
@@ -80,7 +81,7 @@ export default function UploadScreen() {
         </div>
 
         {/* Cards de benefício */}
-        <div className="grid grid-cols-3 gap-3 mb-8 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 text-center">
           {[
             { Icon: IconBarChart, title: 'Cycle Time & Throughput', desc: 'Percentis P50, P85, P95 e mediana de entregas por período.' },
             { Icon: IconClock, title: 'Aging WIP', desc: 'Veja quais itens estão envelhecendo além do limite saudável.' },
@@ -112,15 +113,20 @@ export default function UploadScreen() {
           <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={onFileChange} />
         </div>
         {loading && <div className="mt-4 text-center text-[#BF452A] font-medium animate-pulse">Processando arquivo...</div>}
-        {error && <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>}
+
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Aviso de privacidade */}
-        <div className="mt-5 flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-xs">
-          <IconWarning size={15} className="shrink-0 mt-0.5 text-amber-600" />
-          <span>
+        <Alert className="mt-5 bg-amber-50 border-amber-200 text-amber-800 text-xs">
+          <IconWarning size={15} className="shrink-0 text-amber-600" />
+          <AlertDescription>
             <strong>Seus dados ficam apenas no seu navegador.</strong> O QuickFlow não envia nem armazena nenhuma informação em servidores. Se você atualizar ou fechar a página, os dados serão perdidos.
-          </span>
-        </div>
+          </AlertDescription>
+        </Alert>
 
         {/* CTA da criadora */}
         <div className="mt-8 bg-[#092140] rounded-2xl px-6 py-5 flex flex-col sm:flex-row items-center gap-4">
@@ -131,14 +137,11 @@ export default function UploadScreen() {
               Especialista em gestão estratégica e aprendizagem. Ajuda times e organizações a usarem dados de fluxo para tomar decisões melhores e entregar mais valor.
             </p>
           </div>
-          <a
-            href="https://vicduarte.site/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 px-4 py-2 bg-[#BF452A] hover:bg-[#a33a22] text-white text-xs font-bold rounded-full transition-colors whitespace-nowrap"
-          >
-            <span className="flex items-center gap-1.5">Conheça o trabalho <IconExternalLink size={12} /></span>
-          </a>
+          <Button asChild size="sm" className="shrink-0 rounded-full">
+            <a href="https://vicduarte.site/" target="_blank" rel="noopener noreferrer">
+              <span className="flex items-center gap-1.5">Conheça o trabalho <IconExternalLink size={12} /></span>
+            </a>
+          </Button>
         </div>
 
       </div>

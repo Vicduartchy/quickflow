@@ -1,6 +1,7 @@
 import { useApp } from '../lib/context'
 import { buildWorkItems } from '../lib/mapping'
 import type { ColumnMapping } from '../types'
+import { Button } from './ui/button'
 
 const FIELDS: Array<{ key: keyof ColumnMapping; labelKey: string; required?: boolean }> = [
   { key: 'id', labelKey: 'id' },
@@ -49,12 +50,12 @@ export default function MappingScreen() {
         ))}
       </div>
       <div className="flex gap-3 mt-6">
-        <button onClick={() => setStep('upload')} className="px-6 py-2 rounded-lg border border-[#D99789] text-[#092140] hover:bg-[#F2C5BB]/20 transition-colors">
+        <Button variant="outline" onClick={() => setStep('upload')}>
           {t.mapping.back}
-        </button>
-        <button onClick={onContinue} disabled={!canContinue} className="px-6 py-2 rounded-lg bg-[#BF452A] text-white font-medium hover:bg-[#a33a22] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+        </Button>
+        <Button onClick={onContinue} disabled={!canContinue}>
           {t.mapping.next}
-        </button>
+        </Button>
       </div>
     </div>
   )

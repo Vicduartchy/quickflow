@@ -6,6 +6,8 @@ import type { GroupBy } from "../types"
 import Charts from "./charts/Charts"
 import InsightsPanel from "./InsightsPanel"
 import { IconWarning, IconInfo, IconDownload } from "./Icons"
+import { Button } from "./ui/button"
+import { Alert, AlertDescription } from "./ui/alert"
 
 export default function DashboardScreen() {
   const {
@@ -91,7 +93,9 @@ export default function DashboardScreen() {
       <aside className="w-64 shrink-0 bg-white border-r border-[#F2C5BB] p-5 overflow-y-auto print:hidden">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-[#092140]">{t.dashboard.filters}</h2>
-          <button onClick={resetAll} className="text-xs text-[#BF452A] hover:underline">{t.dashboard.reset}</button>
+          <Button variant="link" size="sm" onClick={resetAll} className="h-auto p-0 text-xs">
+            {t.dashboard.reset}
+          </Button>
         </div>
         <div className="mb-5">
           <label className="text-xs font-semibold text-[#D99789] uppercase tracking-wide block mb-1">{t.dashboard.from}</label>
@@ -164,20 +168,17 @@ export default function DashboardScreen() {
       </aside>
       <main ref={mainRef} className="flex-1 p-6 overflow-y-auto print:w-full print:p-0">
         {hasNoConcluded && (
-          <div className="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
-            <IconWarning size={15} className="shrink-0 mt-0.5" /><span>{t.dashboard.wipOnly}</span>
-          </div>
+          <Alert className="mb-4 bg-yellow-50 border-yellow-300 text-yellow-800">
+            <IconWarning size={15} className="shrink-0" />
+            <AlertDescription>{t.dashboard.wipOnly}</AlertDescription>
+          </Alert>
         )}
         <div className="flex items-center justify-between mb-4 print:hidden">
           <div />
-          <button
-            onClick={exportImage}
-            disabled={exporting}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D99789] text-[#092140] hover:bg-[#F2C5BB]/30 text-sm transition-colors disabled:opacity-50"
-          >
+          <Button variant="outline" size="sm" onClick={exportImage} disabled={exporting}>
             <IconDownload size={14} />
             {exporting ? 'Exportando…' : 'Exportar Imagem'}
-          </button>
+          </Button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
           {[
@@ -195,9 +196,12 @@ export default function DashboardScreen() {
           ))}
         </div>
         {isLastPartial && (
-          <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded text-xs">
-            <span className="flex items-center gap-1.5"><IconInfo size={13} className="shrink-0" /> Último período incompleto — excluído do cálculo do Throughput mediano ({tpMedian}/semana).</span>
-          </div>
+          <Alert className="mb-4 bg-blue-50 border-blue-200 text-blue-700">
+            <IconInfo size={13} className="shrink-0" />
+            <AlertDescription>
+              Último período incompleto — excluído do cálculo do Throughput mediano ({tpMedian}/semana).
+            </AlertDescription>
+          </Alert>
         )}
         <InsightsPanel items={filteredItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />
         <Charts items={filteredItems} agingItems={agingItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />

@@ -1,5 +1,7 @@
 import { useApp } from "../lib/context"
 import type { StatusCategory } from "../types"
+import { Button } from "./ui/button"
+import { Alert, AlertDescription } from "./ui/alert"
 
 const CATEGORY_COLORS: Record<StatusCategory, string> = {
   backlog: "bg-blue-100 text-blue-800",
@@ -29,9 +31,11 @@ export default function PolicyScreen() {
       <h1 className="text-2xl font-bold text-[#092140] mb-2">{t.policy.title}</h1>
       <p className="text-[#D99789] mb-8">{t.policy.subtitle}</p>
       {statuses.length === 0 ? (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm mb-6">
-          Nenhum status encontrado. Verifique o mapeamento da coluna de status.
-        </div>
+        <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 mb-6">
+          <AlertDescription>
+            Nenhum status encontrado. Verifique o mapeamento da coluna de status.
+          </AlertDescription>
+        </Alert>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-[#F2C5BB] overflow-hidden mb-6">
           {statuses.map(status => {
@@ -56,12 +60,12 @@ export default function PolicyScreen() {
         </div>
       )}
       <div className="flex gap-3">
-        <button onClick={() => setStep("mapping")} className="px-6 py-2 rounded-lg border border-[#D99789] text-[#092140] hover:bg-[#F2C5BB]/20 transition-colors">
+        <Button variant="outline" onClick={() => setStep("mapping")}>
           {t.policy.back}
-        </button>
-        <button onClick={() => setStep("dashboard")} className="px-6 py-2 rounded-lg bg-[#BF452A] text-white font-medium hover:bg-[#a33a22] transition-colors">
+        </Button>
+        <Button onClick={() => setStep("dashboard")}>
           {t.policy.next}
-        </button>
+        </Button>
       </div>
     </div>
   )
