@@ -18,6 +18,7 @@ export default function DashboardScreen() {
     dateFrom, setDateFrom,
     dateTo, setDateTo,
     resetAll,
+    lang,
   } = useApp()
 
   const [excludeZeroCT, setExcludeZeroCT] = useState(false)
@@ -111,7 +112,7 @@ export default function DashboardScreen() {
             {groupByOptions.map(g => (
               <button key={g} onClick={() => setGroupBy(g)}
                 className={groupBy === g ? "px-3 py-1 rounded-full text-xs font-medium bg-[#BF452A] text-white" : "px-3 py-1 rounded-full text-xs font-medium bg-[#F2F2F2] text-[#092140] hover:bg-[#F2C5BB]"}>
-                {getGroupLabel(g, "pt-BR")}
+                {getGroupLabel(g, lang)}
               </button>
             ))}
           </div>
