@@ -1,14 +1,15 @@
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
+import html2canvas from "html2canvas"
 import { useApp } from "../lib/context"
 import { getPercentile, getGroupLabel, computeThroughputMedian } from "../lib/mapping"
 import type { GroupBy } from "../types"
 import Charts from "./charts/Charts"
 import InsightsPanel from "./InsightsPanel"
-import { IconWarning, IconInfo } from "./Icons"
+import { IconWarning, IconInfo, IconDownload } from "./Icons"
 
 export default function DashboardScreen() {
   const {
-    t, workItems, groupBy, setGroupBy,
+    t, workItems, flowPolicy, groupBy, setGroupBy,
     selectedTeams, setSelectedTeams,
     selectedStatuses, setSelectedStatuses,
     selectedTypes, setSelectedTypes,
@@ -18,6 +19,8 @@ export default function DashboardScreen() {
   } = useApp()
 
   const [excludeZeroCT, setExcludeZeroCT] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const mainRef = useRef<HTMLDivElement>(null)
 
   const allTeams = useMemo(() => [...new Set(workItems.map(i => i.team).filter(Boolean) as string[])].sort(), [workItems])
   const allStatuses = useMemo(() => [...new Set(workItems.map(i => i.currentStatus).filter(Boolean) as string[])].sort(), [workItems])
@@ -34,9 +37,21 @@ export default function DashboardScreen() {
     })
   }, [workItems, dateFrom, dateTo, selectedTeams, selectedStatuses, selectedTypes])
 
+  // Se o usuário classificou status wip na PolicyScreen, usa essa classificação para o Aging Chart.
+  // Caso contrário, cai no comportamento padrão (itens sem exitDate).
+  const wipPolicyStatuses = useMemo(() =>
+    flowPolicy.statusConfigs.filter(c => c.category === 'wip').map(c => c.status)
+  , [flowPolicy])
+
+  const agingItems = useMemo(() =>
+    wipPolicyStatuses.length > 0
+      ? filteredItems.filter(i => wipPolicyStatuses.includes(i.currentStatus ?? ''))
+      : filteredItems.filter(i => i.cycleTime === undefined)
+  , [filteredItems, wipPolicyStatuses])
+
   const concluded = filteredItems.filter(i => i.cycleTime !== undefined)
   const concludedForMetrics = excludeZeroCT ? concluded.filter(i => i.cycleTime! > 0) : concluded
-  const wip = filteredItems.filter(i => i.cycleTime === undefined)
+  const wip = agingItems
   const hasNoConcluded = concluded.length === 0
 
   const ctValues = concludedForMetrics.map(i => i.cycleTime!).sort((a, b) => a - b)
@@ -50,6 +65,25 @@ export default function DashboardScreen() {
 
   function toggleFilter<T>(val: T, list: T[], setList: (l: T[]) => void) {
     setList(list.includes(val) ? list.filter(x => x !== val) : [...list, val])
+  }
+
+  async function exportImage() {
+    if (!mainRef.current || exporting) return
+    setExporting(true)
+    try {
+      const canvas = await html2canvas(mainRef.current, {
+        scale: 2,
+        useCORS: true,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+      })
+      const link = document.createElement('a')
+      link.download = 'quickflow-dashboard.png'
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } finally {
+      setExporting(false)
+    }
   }
 
   return (
@@ -128,12 +162,23 @@ export default function DashboardScreen() {
           </div>
         )}
       </aside>
-      <main className="flex-1 p-6 overflow-y-auto print:w-full print:p-0">
+      <main ref={mainRef} className="flex-1 p-6 overflow-y-auto print:w-full print:p-0">
         {hasNoConcluded && (
           <div className="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
             <IconWarning size={15} className="shrink-0 mt-0.5" /><span>{t.dashboard.wipOnly}</span>
           </div>
         )}
+        <div className="flex items-center justify-between mb-4 print:hidden">
+          <div />
+          <button
+            onClick={exportImage}
+            disabled={exporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D99789] text-[#092140] hover:bg-[#F2C5BB]/30 text-sm transition-colors disabled:opacity-50"
+          >
+            <IconDownload size={14} />
+            {exporting ? 'Exportando…' : 'Exportar Imagem'}
+          </button>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
           {[
             { label: t.dashboard.completed, value: concluded.length },
@@ -155,7 +200,7 @@ export default function DashboardScreen() {
           </div>
         )}
         <InsightsPanel items={filteredItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />
-        <Charts items={filteredItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />
+        <Charts items={filteredItems} agingItems={agingItems} groupBy={groupBy} excludeZeroCT={excludeZeroCT} />
       </main>
     </div>
   )
