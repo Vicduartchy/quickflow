@@ -69,7 +69,7 @@ export default function UploadScreen() {
           <img
             src="/quickflow/quickflow-logo-dark.png"
             alt="QuickFlow"
-            className="h-28 object-contain mx-auto mb-5"
+            className="h-44 object-contain mx-auto mb-5"
           />
           <p className="text-lg text-[#BF452A] font-medium mb-4">Métricas de fluxo ágil, sem complicação.</p>
           <p className="text-[#555] text-sm leading-relaxed max-w-xl mx-auto">
